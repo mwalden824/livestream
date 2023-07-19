@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leech Streams</title>
+    <link href="style.css" rel="stylesheet">
+    <script src="script.js"></script>
+    <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <img src="resources/logo-placerholder.png" alt="Logo">
+            </div>
+            <div class="search">
+                <input type="text" placeholder="Search">
+                <button type="submit">Search</button>
+            </div>
+            <div>
+                <!-- <img src="icon1.png" alt="Icon 1"> -->
+                <!-- <i class="fa fa-sign-out" id="nav-bar-icons"></i> -->
+                <i class="fa fa-sign-out" style="font-size: 48px;color: white; padding-right: 10px;"></i>
+                <!-- <img src="icon2.png" alt="Icon 2"> -->
+            </div>
+        </nav>
+    </header>    
+    <div class="container">
+        <!-- <button id="sidebar-toggle">Open Sidebar</button> -->
+        <!-- <div class="content"> -->
+            <!-- Main content here -->
+            <!-- <video id="videoPlayer" class="video-js vjs-default-skin" controls></video> -->
+        <!-- </div> -->
+        <div id="sidebar">
+            <!-- Sidebar content here -->
+            <div class="toggle-btn" onclick="show()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <!-- <div style="width: 30px;"></div> -->
+            <div class="sidebar-elements">
+                <div class="logo">
+                    <img src="resources/logo-placerholder.png">
+                </div>
+
+                <ul>
+                    <li><i class="fas fa-home" id="icon"></i>Home</li>
+                    <li><i class="fas fa-user" id="icon"></i>Streamer #2</li>
+                    <li><i class="fas fa-envelope" id="icon"></i>Streamer #3</li>
+                    <li><i class="fas fa-list" id="icon"></i>Streamer #4</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <main>
+         <!-- Main content goes here -->
+    </main>
+    <!-- <script>
+        var videoPlayer = videojs('videoPlayer');
+        videoPlayer.src({
+            // src: '/segments/stream/stream.m3u8',
+            src: '/stream/hls/stream.m3u8',
+            // src: '/segments/master.m3u8',
+            type: 'application/x-mpegURL'
+        });
+    </script> -->
+</body>
+</html>

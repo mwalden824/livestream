@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+header {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    width: 100%;
+    background-color: #000000;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(102, 96, 96, 0.596);
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+  
+.search input[type="text"] {
+    padding: 5px;
+    border: none;
+    border-radius: 3px;
+}
+
+
+.search button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.nav-bar-icons {
+    /* height: 30px; */
+    /* width: auto; */
+    font-size: 24px;
+    color: #fff;
+}
+  
+
+body {
+    font-family: Source Sans Pro;
+}
+  
+#sidebar {
+    /* position: absolute; */
+    position: fixed;
+    /* top: 0; */
+    /* right: -15%; Initially hidden, adjust as needed */
+    width: 300px; /* Adjust the width as needed */
+    height: 100%;
+    background: #000000;
+    /* left: -200px; */
+    right: -250px;
+    /* transition: right 0.3s ease; */
+    /* transition: left 0.3s ease; */
+    transition: right 0.3s ease;
+    /* padding-top: 120px; */
+    margin-top: 60px;
+}
+
+#sidebar.active {
+    right: 0;
+    /* left: 0; */
+}
+
+.sidebar-elements {
+    padding-top: 15px;
+}
+
+.logo {
+    margin-left: 80px;
+    
+    /* padding: 30px; */
+}
+
+#icon {
+    margin-right: 15px;
+    width: 30px;
+}
+
+#sidebar ul li {
+    list-style: none;
+    color: #ffffff;
+    font-size: 20px;
+    padding: 10px 12px;
+
+}
+
+#sidebar .toggle-btn {
+    position: absolute;
+    /* align-content: flex-end; */
+    top: 15px;
+    left: 10px;
+    /* padding-top: 110px; */
+    /* right: 20px; */
+}
+
+#sidebar .toggle-btn span {
+    width: 30px;
+    height: 4px;
+    background: #0cad62;
+    display: block;
+    margin-top: 4px;
+}
+
+/* main { */
+    /* flex: 1; */
+    /* padding-top: 60px; */
+/* } */
+
+  /* .content {
+    margin-right: 0;
+    transition: margin-right 0.3s ease;
+  }
+  
+  .sidebar.open {
+    right: 0;
+  }
+  
+  .content.open {
+    margin-right: 20%; /* Adjust the width of the sidebar when opened */
+ 
