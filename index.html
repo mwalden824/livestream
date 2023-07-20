@@ -28,11 +28,6 @@
         </nav>
     </header>    
     <div class="container">
-        <!-- <button id="sidebar-toggle">Open Sidebar</button> -->
-        <!-- <div class="content"> -->
-            <!-- Main content here -->
-            <!-- <video id="videoPlayer" class="video-js vjs-default-skin" controls></video> -->
-        <!-- </div> -->
         <div id="sidebar">
             <!-- Sidebar content here -->
             <div class="toggle-btn" onclick="show()">
@@ -40,7 +35,6 @@
                 <span></span>
                 <span></span>
             </div>
-
             <!-- <div style="width: 30px;"></div> -->
             <div class="sidebar-elements">
                 <div class="logo">
@@ -56,17 +50,69 @@
             </div>
         </div>
     </div>
-    <main>
+    <div class="left-container">
+        <div id="left-sidebar">
+            <div class="toggle-chat-btn" onclick="showChat()">
+                <i class="fas fa-comment-dots" style="font-size: 24px;color: white;"></i>
+            </div>
+            <div class="chat-messages">
+                <span>Screenname: Hey what's up?</span><br>
+                <span>Screenname: Hey what's up?</span><br>
+                <span>Screenname: Hey what's up?</span><br>
+                <span>Screenname: Hey what's up?</span><br>
+                <span>Screenname: Hey what's up?</span><br>
+            </div>
+            <div class="chat-control">
+                <input type="text">
+                <button type="submit">Send</button>
+            </div>
+        </div>
+    </div>    
+    <main id="main">
          <!-- Main content goes here -->
+        <div id="content">
+            <!-- <div class="chat-open-btn-overlay"></div> -->
+            <!-- <button id="chat-open">Open</button> -->
+            <div id="videoElement">
+                <video id="videoPlayer" class="video-js vjs-default-skin" controls></video>
+            </div>
+            <img src="resources/offline-image-placeholder.png" id="offline-image-placeholder">
+        </div>
+        <div class="profile">
+            <p>
+                The First Amendment provides several rights protections: to express ideas through speech and the press, 
+                to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
+                It also protects the right to religious beliefs and practices. It prevents the government from creating or 
+                favoring a religion.
+            </p>
+            <p>
+                The First Amendment provides several rights protections: to express ideas through speech and the press, 
+                to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
+                It also protects the right to religious beliefs and practices. It prevents the government from creating or 
+                favoring a religion.
+            </p>
+            <p>
+                The First Amendment provides several rights protections: to express ideas through speech and the press, 
+                to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
+                It also protects the right to religious beliefs and practices. It prevents the government from creating or 
+                favoring a religion.
+            </p>
+        </div>
     </main>
-    <!-- <script>
+    <script>
+        var imageFallback = document.getElementById('offline-image-placeholder');
+        var videoElement = document.getElementById('videoElement');
+        var videoPlayerElement = document.getElementById('videoPlayer');
+
+        videoPlayerElement.addEventListener("error", function() {
+            videoElement.style.display = 'none';
+            imageFallback.style.display = 'block';
+        });
         var videoPlayer = videojs('videoPlayer');
         videoPlayer.src({
-            // src: '/segments/stream/stream.m3u8',
             src: '/stream/hls/stream.m3u8',
-            // src: '/segments/master.m3u8',
             type: 'application/x-mpegURL'
         });
-    </script> -->
+    </script>
 </body>
 </html>

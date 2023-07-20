@@ -1,13 +1,10 @@
-// const sidebarToggle = document.getElementById("sidebar-toggle");
-// const sidebar = document.querySelector(".sidebar");
-// const content = document.querySelector(".content");
-
-// sidebarToggle.addEventListener("click", function () {
-//   sidebar.classList.toggle("open");
-//   content.classList.toggle("open");
-// });
-
 function show() {
     document.getElementById('sidebar').classList.toggle('active');
-    console.log("Test");
+    document.getElementById('main').classList.toggle('active');
+    document.getElementById('content').classList.toggle('active');
+}
+
+function showChat() {
+    document.getElementById('left-sidebar').classList.toggle('active');
+    document.getElementById('main').classList.toggle('left-active');
 }
