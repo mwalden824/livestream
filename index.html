@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Leech Streams</title>
     <link href="style.css" rel="stylesheet">
-    <script src="script.js"></script>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
     <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="resources/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="logo">
-                <img src="resources/logo-placerholder.png" alt="Logo">
+                <div class="logo-text">
+                    <img src="resources/logo-text.png" alt="Logo">
+                </div>
+                <div class="logo-icon">
+                    <div id="logo-icon-image"></div>
+                </div>
             </div>
             <div class="search">
-                <input type="text" placeholder="Search">
-                <button type="submit">Search</button>
+                <input type="text" placeholder="Search" id="search-textbox">
+                <button type="button" id="search-button" class="nav-button">Search</button>
             </div>
-            <div>
-                <!-- <img src="icon1.png" alt="Icon 1"> -->
-                <!-- <i class="fa fa-sign-out" id="nav-bar-icons"></i> -->
-                <i class="fa fa-sign-out" style="font-size: 48px;color: white; padding-right: 10px;"></i>
-                <!-- <img src="icon2.png" alt="Icon 2"> -->
+            <div class="navbar-right">
+                <div class="login">
+                    <button type="button" class="nav-button" id="login-button">Login</button>
+                </div>
+                <div class="signup">
+                    <button type="button" class="nav-button" id="signup-button">Signup</button>
+                </div>
+                <!-- <i class="fa fa-sign-out" style="font-size: 48px;color: white; padding-right: 10px;"></i> -->
             </div>
         </nav>
     </header>    
@@ -35,18 +45,29 @@
                 <span></span>
                 <span></span>
             </div>
-            <!-- <div style="width: 30px;"></div> -->
             <div class="sidebar-elements">
                 <div class="logo">
-                    <img src="resources/logo-placerholder.png">
+                    <!-- <img src="resources/logo-placerholder.png"> -->
+                    <div class="recommended">RECOMMENDED</div>
                 </div>
-
-                <ul>
-                    <li><i class="fas fa-home" id="icon"></i>Home</li>
-                    <li><i class="fas fa-user" id="icon"></i>Streamer #2</li>
-                    <li><i class="fas fa-envelope" id="icon"></i>Streamer #3</li>
-                    <li><i class="fas fa-list" id="icon"></i>Streamer #4</li>
-                </ul>
+                <div class="streamers">
+                    <div class="streamer-row">
+                        <div class="streamer-pic"><img src="resources/man1.png" id="icon"></div>
+                        <div class="streamer-name">LiveGuru89</div>
+                    </div>
+                    <div class="streamer-row">
+                        <div class="streamer-pic"><img src="resources/woman1.png" id="icon"></div>
+                        <div class="streamer-name">BroadcastNinja</div>
+                    </div>
+                    <div class="streamer-row">
+                        <div class="streamer-pic"><img src="resources/man2.png" id="icon"></div>
+                        <div class="streamer-name">StreamWizard</div>
+                    </div>
+                    <div class="streamer-row">
+                        <div class="streamer-pic"><img src="resources/woman2.png" id="icon"></div>
+                        <div class="streamer-name">VideoMaestro76</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -56,63 +77,173 @@
                 <i class="fas fa-comment-dots" style="font-size: 24px;color: white;"></i>
             </div>
             <div class="chat-messages">
-                <span>Screenname: Hey what's up?</span><br>
-                <span>Screenname: Hey what's up?</span><br>
-                <span>Screenname: Hey what's up?</span><br>
-                <span>Screenname: Hey what's up?</span><br>
-                <span>Screenname: Hey what's up?</span><br>
+                <div class="row">
+                    <span class="screenname">Bob:</span>
+                    <span class="message">Hey, what you doing tonight?</span>
+                </div>
+                <div class="row">
+                    <span class="screenname">Tom:</span>
+                    <span class="message">Nothing man, going to sit here on Leech because I got no life.</span>
+                </div>
+                <div class="row">
+                    <span class="screenname">Bob:</span>
+                    <span class="message">That's what beer is for man</span>
+                </div>
+                <div class="row">
+                    <span class="screenname">Tom:</span>
+                    <span class="message">I quit drinking along time ago.</span>
+                </div>
+                <div class="row">
+                    <span class="screenname">Tom:</span>
+                    <span class="message">My doc says I got a bad liver</span>
+                </div>
             </div>
             <div class="chat-control">
-                <input type="text">
-                <button type="submit">Send</button>
+                <input type="text" class="chat-textbox">
+                <button type="button" class="btn btn-custom" id="chat-send">Send</button>
             </div>
         </div>
     </div>    
     <main id="main">
          <!-- Main content goes here -->
         <div id="content">
-            <!-- <div class="chat-open-btn-overlay"></div> -->
-            <!-- <button id="chat-open">Open</button> -->
             <div id="videoElement">
                 <video id="videoPlayer" class="video-js vjs-default-skin" controls></video>
+                <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i>
             </div>
-            <img src="resources/offline-image-placeholder.png" id="offline-image-placeholder">
+            <div class="image-container">
+                <img src="resources/offline-image-placeholder.png" id="offline-image-placeholder">
+                <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i>
+            </div>
         </div>
         <div class="profile">
-            <p>
-                The First Amendment provides several rights protections: to express ideas through speech and the press, 
-                to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
-                It also protects the right to religious beliefs and practices. It prevents the government from creating or 
-                favoring a religion.
-            </p>
-            <p>
-                The First Amendment provides several rights protections: to express ideas through speech and the press, 
-                to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
-                It also protects the right to religious beliefs and practices. It prevents the government from creating or 
-                favoring a religion.
-            </p>
-            <p>
-                The First Amendment provides several rights protections: to express ideas through speech and the press, 
-                to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
-                It also protects the right to religious beliefs and practices. It prevents the government from creating or 
-                favoring a religion.
-            </p>
+            <div class="info-section">
+                <div class="profile-picture">
+                    <img src="resources/profile-pic-placeholder.png" id="profile-pic">
+                </div>
+                <div class="name-title-tags">
+                    <div class="username">
+                        UKnowWho
+                    </div>
+                    <div class="stream-title">
+                        My very first stream
+                    </div>
+                    <div class="category-tags">
+                        <div class="category">
+                            Chatting
+                        </div>
+                        <div class="tag">English</div>
+                        <div class="tag">IRL</div>
+                        <div class="tag">18+</div>
+                    </div>
+                </div>
+                <div class="follow-sub-viewers">
+                    <div class="follow-sub">
+                        <div class="follow-sub-div">
+                            <button class="follow-sub-btn">Follow</button>
+                        </div>
+                        <div class="follow-sub-div">
+                            <button class="follow-sub-btn">Subscribe</button>
+                        </div>
+                    </div>
+                    <div class="viewers">
+                        1,876 Viewers
+                    </div>
+                </div>
+            </div>
+            <div class="about-section">
+                <div class="about-section-left">
+                    <div class="about-username">
+                        About UKnowWho
+                    </div>
+                    <div class="followers">
+                        67k Followers
+                    </div>
+                    <div class="description">
+                        Welcome to my Leech channel! 🎮 I'm a passionate gamer who loves exploring virtual worlds, mastering challenging levels, and engaging with an awesome gaming community. Join me on exciting adventures as I play a variety of games, including action, RPGs, and more.
+                    </div>
+                </div>
+                <div class="about-section-right">
+                    <div class="social-links">
+                        <div class="social-link"><img src="resources/icons/youtube.png" class="social-icons">YouTube</div>
+                        <div class="social-link"><img src="resources/icons/twitter.png" class="social-icons">Twitter</div>
+                        <div class="social-link"><img src="resources/icons/instagram.png" class="social-icons">Instagram</div>
+                        <div class="social-link"><img src="resources/icons/discord.png" class="social-icons">Discord</div>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-section">
+                <p>
+                    The First Amendment provides several rights protections: to express ideas through speech and the press, 
+                    to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
+                    It also protects the right to religious beliefs and practices. It prevents the government from creating or 
+                    favoring a religion.
+                </p>
+                <p>
+                    The First Amendment provides several rights protections: to express ideas through speech and the press, 
+                    to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
+                    It also protects the right to religious beliefs and practices. It prevents the government from creating or 
+                    favoring a religion.
+                </p>
+                <p>
+                    The First Amendment provides several rights protections: to express ideas through speech and the press, 
+                    to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
+                    It also protects the right to religious beliefs and practices. It prevents the government from creating or 
+                    favoring a religion.
+                </p>    
+            </div>
         </div>
     </main>
     <script>
         var imageFallback = document.getElementById('offline-image-placeholder');
         var videoElement = document.getElementById('videoElement');
         var videoPlayerElement = document.getElementById('videoPlayer');
+        var openChatBtn = document.getElementById('open-chat-btn');
+        var openChatBtnOffline = document.getElementById('open-chat-button-offline');
 
+        var isPlaying = true;
+
+        openChatBtnOffline.style.display = 'none';
         videoPlayerElement.addEventListener("error", function() {
+            console.log("Video Error");
             videoElement.style.display = 'none';
             imageFallback.style.display = 'block';
+            isPlaying = false;
         });
-        var videoPlayer = videojs('videoPlayer');
+        var videoPlayer = videojs('videoPlayer', {
+            autoplay: 'muted',
+            muted: true
+        });
         videoPlayer.src({
             src: '/stream/hls/stream.m3u8',
+            // src: '/home/mwalden/Projects/livestream/stream/hls/stream.m3u8',
             type: 'application/x-mpegURL'
         });
+        videoPlayer.on('error', function (event) {
+            console.log('Video Error');
+            videoElement.style.display = 'none';
+            imageFallback.style.display = 'block';
+            isPlaying = false;
+        });
+        videoPlayer.play();
+        videoPlayer.muted(false);
+
+        // videoPlayer.play();
+        // videoPlayer.muted(false);
+        // videoPlayer.
+        // videoPlayer.on('ended', function() {
+        //     console.log("Video ENDED");
+        //     videoElement.style.display = 'none';
+        //     imageFallback.style.display = 'block';
+        // });
+        // videoPlayer.on('canplay', function() {
+        //     console.log("Video LOADED");
+        //     videoElement.style.display = 'block';
+        //     imageFallback.style.display = 'none';
+        // });
+        
     </script>
+    <script src="script.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script> -->
 </body>
 </html>

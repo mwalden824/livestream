@@ -9,15 +9,42 @@ header {
     z-index: 1;
     top: 0;
     width: 100%;
-    background-color: #000000;
+    background-color: #323C49;
     padding: 10px;
-    box-shadow: 0 2px 4px rgba(102, 96, 96, 0.596);
+    box-shadow: 0 2px 4px rgba(133, 123, 123, 0.596);
 }
 
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    /* overflow: hidden; */
+}
+
+#logo-icon-image {
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image:url('resources/radiatingHead-static.png');
+}
+
+#logo-icon-image:hover {
+    background-image:url('resources/radiatingHead.gif');
+}
+
+.logo-text {
+    margin-right: 20px;
 }
 
 .logo img {
@@ -31,10 +58,18 @@ header {
     border-radius: 3px;
 }
 
+.recommended {
+    color: white;
+    font-size: 16px;
+    font-weight: bolder;
+    font-family: 'Times New Roman', Times, serif;
+    padding: 10px;
+}
+
 .search button {
     padding: 5px 10px;
     border: none;
-    background-color: #007bff;
+    background-color: #862125;
     color: #fff;
     border-radius: 3px;
     cursor: pointer;
@@ -48,13 +83,14 @@ header {
 
 body {
     font-family: Source Sans Pro;
+    background-color: #323C49;
 }
 
 #sidebar {
     position: fixed;
     width: 300px;
     height: 100%;
-    background: #000000;
+    background: #3A4655;
     right: -250px;
     transition: right 0.3s ease;
     margin-top: 60px;
@@ -64,7 +100,7 @@ body {
     position: fixed;
     width: 300px;
     height: 100%;
-    background: #000000;
+    background: #3A4655;
     left: 0;
     transition: left 0.3s ease;
     margin-top: 60px;
@@ -87,8 +123,27 @@ body {
 }
 
 #icon {
-    margin-right: 15px;
+    /* margin-right: 15px; */
     width: 30px;
+}
+
+.streamer-row {
+    display: flex;
+    padding: 5px;
+}
+
+.streamer-pic {
+    padding-left: 7px;
+}
+
+.streamer-name {
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3px;
 }
 
 #sidebar ul li {
@@ -107,20 +162,15 @@ body {
 #left-sidebar .toggle-chat-btn {
     position: absolute;
     top: 20px;
-    /* right: -50px; */
-    left: 250px;
-    /* z-index: 5; */
-}
-
-.chat-messages {
-    padding-top: 20px;
-    color: white;
+    left: 270px;
+    padding: 3;
+    opacity: 0.5;
 }
 
 #sidebar .toggle-btn span {
     width: 30px;
     height: 4px;
-    background: #0cad62;
+    background: #862125;
     display: block;
     margin-top: 4px;
 }
@@ -139,6 +189,23 @@ body {
     width: 100%;
     height: 100%;
 }
+
+#videoElement {
+    position: relative;
+}
+
+.chat-open-btn-overlay {
+    position: absolute;
+    top: 2%;
+    left: 1%;
+    z-index: 1;
+    opacity: 0.5;
+}
+
+#open-chat-button {
+    display: none;
+}
+
 
 #offline-image-placeholder {
     width: 100%;
@@ -168,4 +235,234 @@ body {
   
 .content.active {
     margin-right: 300px;
+}
+
+
+.chat-open-btn-overlay-offline {
+    position: absolute;
+    top: 5%;
+    left: 1%;
+    z-index: 1;
+    opacity: 0.5;
+}
+
+#open-chat-button-offline {
+    display: none;
+}
+
+.row {
+    margin-bottom: 4px;
+    /* display: flex; */
+}
+
+.screenname {
+    font-weight: bolder;
+    color: #e23439;
+    margin-right: 7px;
+    /* flex: 1; */
+}
+
+.chat-control {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    padding: 5px;
+}
+
+.chat-textbox {
+    flex: 1;
+    padding: 3px;
+    border-radius: 10px;
+    background-color: #323C49;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 3px;
+}
+
+#search-textbox {
+    background-color: #3A4655;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    /* padding: 3px; */
+    margin: 3px;
+}
+
+.btn-custom {
+    background-color: #862125;
+    color: #fff;
+    width: 60px;
+    padding: 5px;
+    border-radius: 10px;
+    margin: 3px;
+    margin-right: 10px;
+}
+
+.navbar-right {
+    display: flex;
+    margin-right: 20px;
+}
+
+.nav-button {
+    background-color: #862125;
+    color: #fff;
+    padding: 10px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    border-radius: 10px;
+    margin: 3px;
+
+}
+
+.nav-button:hover {
+    background-color: #903035;
+}
+
+.btn-custom:hover {
+    background-color: #903035;
+}
+
+.chat-messages {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    padding-top: 20px;
+    color: white;
+    padding: 10px;
+}
+
+.info-section {
+    display: flex;
+}
+
+.profile-picture {
+    flex: 0 0 100px;
+}
+
+.name-title-tags {
+    flex: 1;
+}
+
+.profile {
+    background-color: #323C49;
+    color: white;
+}
+
+#profile-pic {
+    width: 90px;
+    padding: 10px;
+}
+
+.name-title-tags {
+    padding: 10px;
+}
+
+.username {
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.stream-title {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.category-tags {
+    display: flex;
+    margin-top: 10px;
+}
+
+.category {
+    font-size: 18px;
+    color: #0cad62;
+    font-weight: bold;
+}
+
+.tag {
+    background-color: #3A4655;
+    border-radius: 4px;
+    padding: 4px;
+    margin-left: 5px;
+    margin-right: 5px;
+    color: grey;
+    cursor: pointer;
+}
+
+.tag:hover {
+    color: white;
+}
+
+.follow-sub {
+    display: flex;
+}
+
+.follow-sub-btn {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    color: white;
+    background-color: #862125;
+}
+
+.follow-sub-div {
+    padding: 5px;
+}
+
+.viewers {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+}
+
+.about-section {
+    display: flex;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: #3A4655;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.about-section-left {
+    padding: 10px;
+}
+
+.about-username {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 22px;
+    font-weight: bolder;
+    padding: 5px;
+}
+
+.followers {
+    padding: 5px;
+}
+
+.description {
+    padding: 5px;
+}
+
+.about-section-right {
+    flex: 0 0 120px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.social-icons {
+    width: 30px;
+    margin-right: 5px;
+}
+
+.profile-section {
+    padding: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
