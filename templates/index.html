@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Leech Streams</title>
-    <link href="style.css" rel="stylesheet">
+    <!-- <link href="../static/css/style.css" rel="stylesheet"> -->
+    <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
     <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="icon" href="resources/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../static/resources/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="logo">
                 <div class="logo-text">
-                    <img src="resources/logo-text.png" alt="Logo">
+                    <img src="../static/resources/logo-text.png" alt="Logo">
                 </div>
                 <div class="logo-icon">
                     <div id="logo-icon-image"></div>
@@ -52,19 +57,19 @@
                 </div>
                 <div class="streamers">
                     <div class="streamer-row">
-                        <div class="streamer-pic"><img src="resources/man1.png" id="icon"></div>
+                        <div class="streamer-pic"><img src="../static/resources/man1.png" id="icon"></div>
                         <div class="streamer-name">LiveGuru89</div>
                     </div>
                     <div class="streamer-row">
-                        <div class="streamer-pic"><img src="resources/woman1.png" id="icon"></div>
+                        <div class="streamer-pic"><img src="../static/resources/woman1.png" id="icon"></div>
                         <div class="streamer-name">BroadcastNinja</div>
                     </div>
                     <div class="streamer-row">
-                        <div class="streamer-pic"><img src="resources/man2.png" id="icon"></div>
+                        <div class="streamer-pic"><img src="../static/resources/man2.png" id="icon"></div>
                         <div class="streamer-name">StreamWizard</div>
                     </div>
                     <div class="streamer-row">
-                        <div class="streamer-pic"><img src="resources/woman2.png" id="icon"></div>
+                        <div class="streamer-pic"><img src="../static/resources/woman2.png" id="icon"></div>
                         <div class="streamer-name">VideoMaestro76</div>
                     </div>
                 </div>
@@ -76,31 +81,11 @@
             <div class="toggle-chat-btn" onclick="showChat()">
                 <i class="fas fa-comment-dots" style="font-size: 24px;color: white;"></i>
             </div>
-            <div class="chat-messages">
-                <div class="row">
-                    <span class="screenname">Bob:</span>
-                    <span class="message">Hey, what you doing tonight?</span>
-                </div>
-                <div class="row">
-                    <span class="screenname">Tom:</span>
-                    <span class="message">Nothing man, going to sit here on Leech because I got no life.</span>
-                </div>
-                <div class="row">
-                    <span class="screenname">Bob:</span>
-                    <span class="message">That's what beer is for man</span>
-                </div>
-                <div class="row">
-                    <span class="screenname">Tom:</span>
-                    <span class="message">I quit drinking along time ago.</span>
-                </div>
-                <div class="row">
-                    <span class="screenname">Tom:</span>
-                    <span class="message">My doc says I got a bad liver</span>
-                </div>
+            <div class="chat-messages" id="chatMessages">
             </div>
             <div class="chat-control">
-                <input type="text" class="chat-textbox">
-                <button type="button" class="btn btn-custom" id="chat-send">Send</button>
+                <input type="text" class="chat-textbox" id="chatTextBox">
+                <button type="button" class="btn btn-custom" id="chat-send" onclick="sendMessage()">Send</button>
             </div>
         </div>
     </div>    
@@ -112,14 +97,14 @@
                 <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i>
             </div>
             <div class="image-container">
-                <img src="resources/offline-image-placeholder.png" id="offline-image-placeholder">
+                <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder">
                 <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i>
             </div>
         </div>
         <div class="profile">
             <div class="info-section">
                 <div class="profile-picture">
-                    <img src="resources/profile-pic-placeholder.png" id="profile-pic">
+                    <img src="../static/resources/profile-pic-placeholder.png" id="profile-pic">
                 </div>
                 <div class="name-title-tags">
                     <div class="username">
@@ -165,10 +150,10 @@
                 </div>
                 <div class="about-section-right">
                     <div class="social-links">
-                        <div class="social-link"><img src="resources/icons/youtube.png" class="social-icons">YouTube</div>
-                        <div class="social-link"><img src="resources/icons/twitter.png" class="social-icons">Twitter</div>
-                        <div class="social-link"><img src="resources/icons/instagram.png" class="social-icons">Instagram</div>
-                        <div class="social-link"><img src="resources/icons/discord.png" class="social-icons">Discord</div>
+                        <div class="social-link"><img src="../static/resources/icons/youtube.png" class="social-icons">YouTube</div>
+                        <div class="social-link"><img src="../static/resources/icons/twitter.png" class="social-icons">Twitter</div>
+                        <div class="social-link"><img src="../static/resources/icons/instagram.png" class="social-icons">Instagram</div>
+                        <div class="social-link"><img src="../static/resources/icons/discord.png" class="social-icons">Discord</div>
                     </div>
                 </div>
             </div>
@@ -215,6 +200,7 @@
             muted: true
         });
         videoPlayer.src({
+            // src: '../stream/hls/stream.m3u8',
             src: '/stream/hls/stream.m3u8',
             // src: '/home/mwalden/Projects/livestream/stream/hls/stream.m3u8',
             type: 'application/x-mpegURL'
@@ -243,7 +229,12 @@
         // });
         
     </script>
-    <script src="script.js"></script>
+    <script src="../static/scripts/script.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script> -->
+    {% for msg in msgs %}
+    <script type="text/javascript">
+        createMessage("{{msg.name}}", "{{msg.message}}");
+    </script>
+    {% endfor %}
 </body>
 </html>
