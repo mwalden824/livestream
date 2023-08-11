@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Leech Streams</title>
+    <title>{% block title %}Leech Streams{% endblock %}</title>
     <!-- <link href="../static/css/style.css" rel="stylesheet"> -->
     <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
@@ -133,124 +133,9 @@
             </div>
         </div>
     </div>
-    <div class="left-container">
-        <div id="left-sidebar">
-            <div class="toggle-chat-btn" onclick="showChat()">
-                <i class="fas fa-comment-dots" style="font-size: 24px;color: white;"></i>
-            </div>
-            <!-- <script>
-                var chatArea = document.get
-            </script> -->
-            <div class="chat-messages" id="chatMessages" onload="chatScrollDown()">
-            </div>
-            <div class="chat-control">
-                {% if current_user.is_authenticated %}
-                    <input type="text" class="chat-textbox" id="chatTextBox">
-                    <button type="button" class="btn btn-custom" id="chat-send" onclick="sendMessage()">Send</button>
-                {% else %}
-                    <input type="text" class="chat-textbox" id="chatTextBox" disabled>
-                    <button type="button" class="btn btn-custom" id="chat-send" onclick="sendMessage()" disabled>Send</button>
-                {% endif %}
-            </div>
-        </div>
-    </div>    
-    <main id="main">
-         <!-- Main content goes here -->
-        <div id="content">
-            <div id="videoElement">
-                <video id="videoPlayer" class="video-js vjs-default-skin" controls></video>
-                <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i>
-            </div>
-            <div class="image-container">
-                <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder">
-                <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i>
-            </div>
-        </div>
-        <div class="profile">
-            <div class="info-section">
-                <div class="profile-picture">
-                    <img src="../static/resources/profile-pic-placeholder.png" id="profile-pic">
-                </div>
-                <div class="name-title-tags">
-                    <div class="username">
-                        UKnowWho
-                    </div>
-                    <div class="stream-title">
-                        My very first stream
-                    </div>
-                    <div class="category-tags">
-                        <div class="category">
-                            Chatting
-                        </div>
-                        <div class="tag">English</div>
-                        <div class="tag">IRL</div>
-                        <div class="tag">18+</div>
-                    </div>
-                </div>
-                <div class="follow-sub-viewers">
-                    <div class="follow-sub">
-                        <div class="follow-sub-div">
-                            <button class="follow-sub-btn">Follow</button>
-                        </div>
-                        <div class="follow-sub-div">
-                            <button class="follow-sub-btn">Subscribe</button>
-                        </div>
-                    </div>
-                    <div class="viewers">
-                        1,876 Viewers
-                    </div>
-                </div>
-            </div>
-            <div class="about-section">
-                <div class="about-section-left">
-                    <div class="about-username">
-                        About UKnowWho
-                    </div>
-                    <div class="followers">
-                        67k Followers
-                    </div>
-                    <div class="description">
-                        Welcome to my Leech channel! 🎮 I'm a passionate gamer who loves exploring virtual worlds, mastering challenging levels, and engaging with an awesome gaming community. Join me on exciting adventures as I play a variety of games, including action, RPGs, and more.
-                    </div>
-                </div>
-                <div class="about-section-right">
-                    <div class="social-links">
-                        <div class="social-link"><img src="../static/resources/icons/youtube.png" class="social-icons">YouTube</div>
-                        <div class="social-link"><img src="../static/resources/icons/twitter.png" class="social-icons">Twitter</div>
-                        <div class="social-link"><img src="../static/resources/icons/instagram.png" class="social-icons">Instagram</div>
-                        <div class="social-link"><img src="../static/resources/icons/discord.png" class="social-icons">Discord</div>
-                    </div>
-                </div>
-            </div>
-            <div class="profile-section">
-                <p>
-                    The First Amendment provides several rights protections: to express ideas through speech and the press, 
-                    to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
-                    It also protects the right to religious beliefs and practices. It prevents the government from creating or 
-                    favoring a religion.
-                </p>
-                <p>
-                    The First Amendment provides several rights protections: to express ideas through speech and the press, 
-                    to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
-                    It also protects the right to religious beliefs and practices. It prevents the government from creating or 
-                    favoring a religion.
-                </p>
-                <p>
-                    The First Amendment provides several rights protections: to express ideas through speech and the press, 
-                    to assemble or gather with a group to protest or for other reasons, and to ask the government to fix problems. 
-                    It also protects the right to religious beliefs and practices. It prevents the government from creating or 
-                    favoring a religion.
-                </p>    
-            </div>
-        </div>
-    </main>
+    {% block content %}{% endblock %}
     <script src="../static/scripts/script.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script> -->
-    {% for msg in msgs %}
-    <script type="text/javascript">
-        createMessage("{{msg.name}}", "{{msg.message}}");
-        messages.scrollTop = messages.scrollHeight;
-    </script>
-    {% endfor %}
+    {% block javascript %}{% endblock %}
 </body>
 </html>

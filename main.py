@@ -62,7 +62,14 @@ def home():
     
     # print("The messages are: ")
     # print(messages)
-    return render_template("index.html", msgs=messages)
+    return render_template("home.html")
+
+
+
+
+@app.route("/streamer", methods=["POST", "GET"])
+def streamer():
+    return render_template("streamer.html", msgs=messages)
 
 @app.route("/login", methods=['POST'])
 def login():
