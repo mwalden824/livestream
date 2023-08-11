@@ -9,15 +9,20 @@ header {
     z-index: 1;
     top: 0;
     width: 100%;
+    height: 55px;
     background-color: #323C49;
     padding: 10px;
-    box-shadow: 0 2px 4px rgba(133, 123, 123, 0.596);
+    /* box-shadow: 0 2px 4px rgba(133, 123, 123, 0.596); */
+    box-shadow: 0 1px 2px rgba(133, 123, 123, 0.596);
+    overflow: hidden;
 }
 
 .navbar {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
+    align-items: left;    
     justify-content: space-between;
+    margin: 0;
 }
 
 .logo {
@@ -49,7 +54,12 @@ header {
 
 .logo img {
     height: 40px;
-    width: auto;
+    /* width: auto; */
+}
+
+.search {
+    flex-grow: 1;
+    text-align: center;
 }
 
 .search input[type="text"] {
@@ -64,6 +74,8 @@ header {
     font-weight: bolder;
     font-family: 'Times New Roman', Times, serif;
     padding: 10px;
+    display: flex;
+    justify-content: center;
 }
 
 .search button {
@@ -119,7 +131,7 @@ body {
 }
 
 .logo {
-    margin-left: 80px;
+    /* margin-left: 80px; */
 }
 
 #icon {
@@ -165,6 +177,7 @@ body {
     left: 270px;
     padding: 3;
     opacity: 0.5;
+    z-index: 300;
 }
 
 #sidebar .toggle-btn span {
@@ -198,7 +211,15 @@ body {
     position: absolute;
     top: 2%;
     left: 1%;
-    z-index: 1;
+    z-index: 10;
+    opacity: 0.5;
+}
+
+.chat-open-btn-overlay-offline {
+    position: absolute;
+    top: 5%;
+    left: 1%;
+    z-index: 10;
     opacity: 0.5;
 }
 
@@ -235,15 +256,6 @@ body {
   
 .content.active {
     margin-right: 300px;
-}
-
-
-.chat-open-btn-overlay-offline {
-    position: absolute;
-    top: 5%;
-    left: 1%;
-    z-index: 1;
-    opacity: 0.5;
 }
 
 #open-chat-button-offline {
@@ -330,6 +342,27 @@ body {
     padding-top: 20px;
     color: white;
     padding: 10px;
+    height: 91.5%;
+    width: 280px;
+    /* overflow-y: scroll; */
+    /* overflow-y: auto; */
+    word-wrap: break-word;
+    z-index: 1;
+    /* display: flex; */
+    flex-direction: column-reverse;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: #29384b;
+    border-radius: 5px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background-color: #547299;
 }
 
 .info-section {
@@ -352,6 +385,17 @@ body {
 #profile-pic {
     width: 90px;
     padding: 10px;
+}
+
+/* .profile-picture-section {
+    position: relative;
+    display: inline-block;
+} */
+
+#profile-pic-placeholder {
+    width: 45px;
+    padding: 10px;
+    cursor: pointer;
 }
 
 .name-title-tags {
@@ -466,3 +510,105 @@ body {
     margin-left: 10px;
     margin-right: 10px;
 }
+
+#signupPopup, #loginPopup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 3;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #3A4655;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);    
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.signup-login-form, .signup-login-form-btn {
+    margin: 5px;
+    padding: 8px;
+    border: 1px solid #862125;
+    border-radius: 5px;
+}
+
+.signup-login-form-btn {
+    background-color: #862125;
+    color: white;
+    cursor: pointer;
+}
+
+#signup-form-btn:hover {
+    background-color: #903035;
+}
+
+h2 {
+    color: white;
+}
+
+#signup-login {
+    align-items: center;
+    text-align: center;
+}
+
+.profile-menu {
+    display: none;
+    /* position: absolute; */
+    top: 20px;
+    right: 80px;
+    width: 100px;
+    background-color: #3A4655;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    opacity: 0.8;
+}
+
+#profile-menu {
+    position: fixed;
+    z-index: 100;
+}
+
+.profile-menu  ul {
+    list-style-type: none;
+    padding: 0px;
+    text-align: center;
+}
+.profile-menu li {
+    padding: 5px;
+    align-items: center;
+}
+
+.profile-menu li:hover {
+    background-color: #60738a;
+    border-radius: 4px;
+}
+
+.profile-menu a {
+    text-decoration: none;
+    color: white;
+}
+
