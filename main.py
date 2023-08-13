@@ -7,6 +7,7 @@ import random
 from string import ascii_letters
 from werkzeug.security import generate_password_hash, check_password_hash
 from os import path
+import hashlib
 
 DB_NAME = "database.db"
 
@@ -22,6 +23,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(40), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
+    streamKey = db.Column(db.String(20), unique=True, nullable=False)
 
 if not path.exists(DB_NAME):
     with app.app_context():
@@ -104,32 +106,52 @@ def signup():
         # flash('')
         print('password too short')
     else:
-        new_user = User(username=username, email=email, password=generate_password_hash(password, method='sha256'))
+        # Calculate a hash from the username and password with sha256 and 
+        # keep first 20 characters to use for stream key
+        stream_key = hashlib.sha256((username + password).encode()).hexdigest()[0:19]
+        new_user = User(username=username, email=email, password=generate_password_hash(password, method='sha256'), streamKey=stream_key)
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user, remember=True)
         print('Account created')
         return redirect(request.referrer)
     
-    return 'Error in Account Creation'
+    return 'Error in Account Creation', 404
 
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(request.referrer)
 
-@app.route('/stream/<stream_key>/index.m3u8')
-def serve_playlist(stream_key):
+@app.route('/stream/<streamer>/index.m3u8')
+def serve_playlist(streamer):
+    user = User.query.filter_by(username=streamer).first()
+    streamKey = user.streamKey
     try:
-        return send_file('stream/'+stream_key+'/index.m3u8', mimetype='application/x-mpegURL')
+        return send_file('stream/'+streamKey+'/index.m3u8', mimetype='application/x-mpegURL')
     except:
-        # print("Error: Could not send playlist file.")
         return "Playlist not found", 404
 
-@app.route('/stream/<stream_key>/<int:segment_number>.ts')
-def serve_segment(stream_key, segment_number):
-    segment_path = f'stream/{stream_key}/{segment_number}.ts'
+@app.route('/stream/<streamer>/<int:segment_number>.ts')
+def serve_segment(streamer, segment_number):
+    user = User.query.filter_by(username=streamer).first()
+    streamKey = user.streamKey
+    segment_path = f'stream/{streamKey}/{segment_number}.ts'
     return send_file(segment_path, mimetype='video/MP2T')
+
+@app.route('/stream-auth', methods=['POST'])
+def auth_stream():
+    if request.method == 'POST':
+        stream_key = request.form.get('name')
+        # print("Stream Key: " + stream_key)
+        user = User.query.filter_by(streamKey=stream_key).first()
+        if user:
+            return "Stream Allowed", 200
+        else:
+            return "Stream Denied", 406
+    else:
+        return "Error", 404
+
 
 @socketio.on("message")
 def message(data):
