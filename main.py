@@ -143,7 +143,6 @@ def serve_segment(streamer, segment_number):
 def auth_stream():
     if request.method == 'POST':
         stream_key = request.form.get('name')
-        # print("Stream Key: " + stream_key)
         user = User.query.filter_by(streamKey=stream_key).first()
         if user:
             return "Stream Allowed", 200
