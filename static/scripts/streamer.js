@@ -22,9 +22,7 @@ var videoPlayer = videojs('videoPlayer', {
     muted: true
 });
 videoPlayer.src({
-    // src: '../stream/hls/stream.m3u8',
-    src: '/stream/hls/stream.m3u8',
-    // src: '/home/mwalden/Projects/livestream/stream/hls/stream.m3u8',
+    src: '/stream/' + streamKey + '/index.m3u8',
     type: 'application/x-mpegURL'
 });
 videoPlayer.on('error', function (event) {

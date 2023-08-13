@@ -16,14 +16,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 db = SQLAlchemy(app)
 # db.init_app(app)
 
-
 # class User(db.Model, UserMixin):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(40), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
-
 
 if not path.exists(DB_NAME):
     with app.app_context():
@@ -34,42 +32,30 @@ if not path.exists(DB_NAME):
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 socketio = SocketIO(app)
 
-# Set this to streamer's username when you setup account, auth, etc.
-# rooms = {}
-room = "UKnowWho"
-members = 0
-
-messages = []
-
-def generate_random_username():
-    letters = ascii_letters
-    return ''.join(random.choice(letters) for _ in range(5))
+# NOTE:  Should probably use redis database if app gets big
+rooms = {}
 
 @app.route("/", methods=["POST", "GET"])
 def home():
-    # session.clear()
-    # session["name"] = generate_random_username()
-    # if session.get("name") is None:
-    #     # Handle case where user hasn't set their name
-    #     return
-    
-    # print("The messages are: ")
-    # print(messages)
     return render_template("home.html")
 
+@app.route("/<streamer>", methods=["POST", "GET"])
+def streamname(streamer):
+    user = User.query.filter_by(username=streamer).first()
+    if user:
+        if str(streamer) not in rooms:
+            session["room"] = str(streamer)
+            rooms[str(streamer)] = {"members": 0, "messages": []}
 
-
-
-@app.route("/streamer", methods=["POST", "GET"])
-def streamer():
-    return render_template("streamer.html", msgs=messages)
+        return render_template("streamer.html", msgs=rooms[streamer]["messages"], username=streamer, stream_key=streamer)
+    else:
+        return render_template("no-account.html", username=streamer)
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -80,13 +66,9 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user:
             if check_password_hash(user.password, password):
-                # flash('')
                 print("Logged in Successfully")
                 login_user(user, remember=True)
-                # return redirect(url_for('home'))
-                # print("User: " + str(user.username))
                 session["name"] = str(user.username)
-                # return 'Login Successful'
                 return redirect(request.referrer)
             else:
                 # flash('')
@@ -95,7 +77,6 @@ def login():
             print("Username doesn't exist")
             # flash('')
 
-    # return render_template("index.html", msgs=messages)
     return 'Authentication Error'
 
 @app.route("/signup", methods=['POST'])
@@ -106,7 +87,6 @@ def signup():
         password = request.form.get('password-signup')
         password2 = request.form.get('password2-signup')
 
-    print('TESTING 123')
     user = User.query.filter_by(email=email).first()
     if user:
         # flash('Email already exists.')
@@ -128,66 +108,65 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user, remember=True)
-        # flash('')
         print('Account created')
-        # return 'Account created'
-        # return '<script>loginSuccessful();</script>'
         return redirect(request.referrer)
-        # return redirect(url_for(home))
     
-    # return render_template('index.html', msgs=messages)
     return 'Error in Account Creation'
 
 @app.route("/logout")
 def logout():
     logout_user()
-    # TODO: reload the current page
-    # return redirect(url_for(home))
     return redirect(request.referrer)
 
-@app.route('/stream/hls/stream.m3u8')
-def serve_playlist():
-    return send_file('stream/hls/stream.m3u8', mimetype='application/x-mpegURL')
+@app.route('/stream/<stream_key>/index.m3u8')
+def serve_playlist(stream_key):
+    try:
+        return send_file('stream/'+stream_key+'/index.m3u8', mimetype='application/x-mpegURL')
+    except:
+        # print("Error: Could not send playlist file.")
+        return "Playlist not found", 404
 
-@app.route('/stream/hls/stream-<int:segment_number>.ts')
-def serve_segment(segment_number):
-    segment_path = f'stream/hls/stream-{segment_number}.ts'
+@app.route('/stream/<stream_key>/<int:segment_number>.ts')
+def serve_segment(stream_key, segment_number):
+    segment_path = f'stream/{stream_key}/{segment_number}.ts'
     return send_file(segment_path, mimetype='video/MP2T')
 
 @socketio.on("message")
 def message(data):
-    # room = session.get("room")
-    global messages
+    room = session.get("room")
     content = {
         "name": session.get("name"),
         "message": data["data"]
     }
 
     send(content, to=room)
-    # send(content)
-    messages.append(content)
+    rooms[room]["messages"].append(content)
     print(f"{session.get('name')} said: {data['data']}")
-    # print(messages)
 
 @socketio.on("connect")
 def connect(auth):
-    global members
     name = session.get("name")
+    room = session.get("room")
     if not name:
+        return
+    
+    if room not in rooms:
         return
 
     join_room(room)
-    members = members + 1
+    rooms[str(room)]["members"] += 1
     print(f"{name} joined room {room}")
 
 @socketio.on("disconnect")
 def disconnect():
-    global members
     name = session.get("name")
+    room = session.get("room")
     leave_room(room)
 
-    members = members - 1
+    if room not in rooms:
+        return
 
+    rooms[str(room)]["members"] -= 1
     print(f"{name} has left the room {room}")
 
 
