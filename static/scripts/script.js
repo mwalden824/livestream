@@ -1,8 +1,22 @@
 
 function show() {
-    document.getElementById('sidebar').classList.toggle('active');
-    document.getElementById('main').classList.toggle('active');
-    document.getElementById('content').classList.toggle('active');
+    var sbar = document.getElementById('sidebar');
+    var main = document.getElementById('main');
+    var content = document.getElementById('content');
+    var dashb = document.getElementById('dashboard');
+
+    if (sbar) {
+        sbar.classList.toggle('active');
+    }
+    if (main) {
+        main.classList.toggle('active');
+    }
+    if (content) {        
+        content.classList.toggle('active');
+    }
+    if (dashb) {        
+        dashb.classList.toggle('active');
+    }
 }
 
 function showSignupPopup() {

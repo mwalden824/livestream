@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for, send_file
+from flask import Flask, render_template, request, session, redirect, url_for, send_file, jsonify
 from flask_socketio import join_room, leave_room, send, SocketIO
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -8,8 +8,16 @@ from string import ascii_letters
 from werkzeug.security import generate_password_hash, check_password_hash
 from os import path
 import hashlib
+import socket
 
 DB_NAME = "database.db"
+# STREAM_HOST_NAME = socket.gethostbyname(socket.gethostname())
+# STREAM_HOST_NAME = socket.gethostbyname(socket.getfqdn())
+HOST_NAME = "10.0.0.80"
+STREAM_PORT = 1935
+STREAM_APP_NAME = "live"
+STREAM_SERVER_URL = HOST_NAME + ":" + str(STREAM_PORT)
+APP_PORT = 5001
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "mysupersecretkeybitch"
@@ -17,15 +25,23 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 db = SQLAlchemy(app)
 # db.init_app(app)
 
-# class User(db.Model, UserMixin):
+
+default_descriptioin = "Streamer's description goes here."
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(40), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
     streamKey = db.Column(db.String(20), unique=True, nullable=False)
+    youtubeUrl = db.Column(db.String(40), default="")
+    twitterUrl = db.Column(db.String(40), default="")
+    instagramUrl = db.Column(db.String(40), default="")
+    discordUrl = db.Column(db.String(40), default="")
+    tiktokUrl = db.Column(db.String(40), default="")
+    description = db.Column(db.String(500), default=default_descriptioin)
 
-if not path.exists(DB_NAME):
+# if not path.exists(DB_NAME):
+if not path.exists("instance/"+DB_NAME):
     with app.app_context():
         db.create_all()
         # db.create_all(app=app)
@@ -51,11 +67,17 @@ def home():
 def streamname(streamer):
     user = User.query.filter_by(username=streamer).first()
     if user:
+        session["room"] = str(streamer)
         if str(streamer) not in rooms:
-            session["room"] = str(streamer)
+            # session["room"] = str(streamer)
             rooms[str(streamer)] = {"members": 0, "messages": []}
 
-        return render_template("streamer.html", msgs=rooms[streamer]["messages"], username=streamer, stream_key=streamer)
+        return render_template(
+            "streamer.html", 
+            msgs=rooms[streamer]["messages"], 
+            username=streamer, 
+            userDescription=user.description,
+            smLinks=[user.youtubeUrl, user.twitterUrl, user.instagramUrl, user.discordUrl, user.tiktokUrl])
     else:
         return render_template("no-account.html", username=streamer)
 
@@ -118,10 +140,66 @@ def signup():
     
     return 'Error in Account Creation', 404
 
+@app.route("/<streamer>/dashboard")
+@login_required
+def dashboard(streamer):
+    user = User.query.filter_by(username=streamer).first()
+    if user:
+        if user.username == current_user.username:
+            return render_template(
+                "dashboard.html", 
+                username=streamer, 
+                ip_adress=STREAM_SERVER_URL, 
+                app_name=STREAM_APP_NAME, 
+                key_for_stream=user.streamKey, 
+                youtube=user.youtubeUrl, 
+                twitter=user.twitterUrl, 
+                instagram=user.instagramUrl, 
+                discord=user.discordUrl, 
+                tiktok=user.tiktokUrl,
+                userDescription=user.description)
+        else:
+            return render_template("access-denied.html", attempted_username=user.username, actual_username=current_user.username)
+    else:
+        return render_template("no-account.html", username=streamer)
+
+@app.route("/save_settings", methods=['POST'])
+@login_required
+def save_settings():
+    data = request.json
+
+    user = User.query.filter_by(username=current_user.username).first()
+    if len(data["old_password"]) > 0 and user:
+        if check_password_hash(user.password, data["old_password"]):
+            # Change password for current user
+            user.password = generate_password_hash(data["new_password"], method='sha256')
+            # db.session.commit()
+        else:
+            return jsonify({"message": "Incorrect password"}), 404
+
+    # Save social media links
+    user.youtubeUrl = data["sm_youtube"]
+    user.twitterUrl = data["sm_twitter"]
+    user.instagramUrl = data["sm_instagram"]
+    user.discordUrl = data["sm_discord"]
+    user.tiktokUrl = data["sm_tiktok"]
+
+    # Save description
+    user.description = data["description"]
+
+    db.session.commit()
+
+    return jsonify({"message": "Settings saved"}), 200
+
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect(request.referrer)
+    # print(request.referrer[-9:])
+    # print(request.referrer[0:22])
+    if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" and len(request.referrer) > 31:
+        return redirect("/")
+    else:
+        return redirect(request.referrer)
 
 @app.route('/stream/<streamer>/index.m3u8')
 def serve_playlist(streamer):
@@ -151,7 +229,6 @@ def auth_stream():
     else:
         return "Error", 404
 
-
 @socketio.on("message")
 def message(data):
     room = session.get("room")
@@ -176,7 +253,7 @@ def connect(auth):
 
     join_room(room)
     rooms[str(room)]["members"] += 1
-    print(f"{name} joined room {room}")
+    # print(f"{name} joined {room}'s room")
 
 @socketio.on("disconnect")
 def disconnect():
@@ -188,9 +265,9 @@ def disconnect():
         return
 
     rooms[str(room)]["members"] -= 1
-    print(f"{name} has left the room {room}")
+    # print(f"{name} has left {room}'s room")
 
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5001)
+    socketio.run(app, host='0.0.0.0', port=APP_PORT)
 

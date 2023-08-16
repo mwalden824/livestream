@@ -22,7 +22,7 @@ var videoPlayer = videojs('videoPlayer', {
     muted: true
 });
 videoPlayer.src({
-    src: '/stream/' + streamKey + '/index.m3u8',
+    src: '/stream/' + streamPath + '/index.m3u8',
     type: 'application/x-mpegURL'
 });
 videoPlayer.on('error', function (event) {

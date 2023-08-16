@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ username }}'s Dashboard{% endblock %}
+{% block content %}
+<!-- <div id="dashboard"> -->
+<main id="dashboard">
+        <div class="dashboard-title">
+        {{ username }}'s Dashboard
+    </div>
+    <div class="dashboard-elements">
+        <div class="dashboard-element" id="dashboard-url-stream-key">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    RTMP Server URL:
+                </div>
+                <div class="dashboard-element-row-value" id="rtmp-text">
+                    rtmp://{{ ip_adress }}/{{ app_name }}
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Stream Key:
+                </div>
+                <div class="dashboard-element-row-value" id="rtmp-text">
+                    {{ key_for_stream }}
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-password">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Old Password:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="password" class="dashboard-textbox" id="old-password-textbox">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    New Password:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="password" class="dashboard-textbox" id="new-password-textbox">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Re-try New Password:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="password" class="dashboard-textbox" id="new-password-retry-textbox">
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-social-media">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    YouTube:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-youtube" value="{{ youtube }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Twitter:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-twitter" value="{{ twitter }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Instagram:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-instagram" value="{{ instagram }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Discord:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-discord" value="{{ discord }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    TikTok:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-tiktok" value="{{ tiktok }}">
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-description-text">
+            <div>
+                Description                
+            </div>
+            <div>
+                <textarea type="text" class="dashboard-description-textbox" rows="5" id="dashboard-description-textbox-id">{{ userDescription }}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-buttons">
+        <button class="buttons" id="dashboard-save-button">Save</button>
+    </div>
+<!-- </div> -->
+</main>
+<script src="../static/scripts/dashboard.js"></script>
+{% endblock %}
+
+
+
