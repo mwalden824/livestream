@@ -3,7 +3,23 @@
 {% block content %}
 <!-- <div id="dashboard"> -->
 <main id="dashboard">
-        <div class="dashboard-title">
+    <div id="dashboard-alert" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDashboardAlert()">&times;</span>
+            <div id="dashboard-alert-header">
+                <h2>Alert</h2>
+            </div>
+            <div class="dashboard-alert-message" id="dashboard-alert-msg">
+                <p>
+                    Your alert goes here.
+                </p>
+            </div>
+            <div class="ok-button">
+                <button class="signup-login-form-btn" onclick="closeDashboardAlert()">OK</button>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-title">
         {{ username }}'s Dashboard
     </div>
     <div class="dashboard-elements">

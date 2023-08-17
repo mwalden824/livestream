@@ -10,6 +10,17 @@ const isValidUrl = urlString=> {
 return !!urlPattern.test(urlString);
 }
 
+function closeDashboardAlert() {
+    document.getElementById('dashboard-alert').style.display = 'none';
+}
+
+function openDashboardAlert(alertMsg) {
+    var dashboardAlertElement =  document.getElementById('dashboard-alert');
+    var dashboardAlertMsgElement =  document.getElementById('dashboard-alert-msg');
+    dashboardAlertMsgElement.innerHTML = alertMsg;
+    dashboardAlertElement.style.display = 'block';
+}
+
 $(document).ready(function() {
     $("#dashboard-save-button").click(function () {
         var oldPassword = $("#old-password-textbox").val();
@@ -20,19 +31,19 @@ $(document).ready(function() {
         if (oldPassword.length != 0) {
             // Make sure newpassword and Retry password match
             if (newPassword != newPasswordRetry) {
-                alert("Retry password doesn't match");
+                openDashboardAlert("Retry password doesn't match");
                 return;
             }
 
             // Make sure the character count of password is within the limit
             if (newPassword.length < 8 || newPassword.length > 20) {
-                alert("New Password needs to be between 8 and 20 characters");
+                openDashboardAlert("New Password needs to be between 8 and 20 characters");
                 return;
             }
 
             // Make sure the user isn't changing to same password
             if (newPassword == oldPassword) {
-                alert("New password should be different from old one");
+                openDashboardAlert("New password should be different from old one");
                 return;
             }
         }
@@ -45,27 +56,27 @@ $(document).ready(function() {
 
         // Make sure social media links are valid urls
         if (!isValidUrl(smYoutube) && smYoutube.length != 0) {
-            alert("Invalid YouTube URL");
+            openDashboardAlert("Invalid YouTube URL");
             return;
         }
 
         if (!isValidUrl(smTwitter) && smTwitter.length != 0) {
-            alert("Invalid Twitter URL");
+            openDashboardAlert("Invalid Twitter URL");
             return;
         }
 
         if (!isValidUrl(smInstagram) && smInstagram.length != 0) {
-            alert("Invalid Instagram URL");
+            openDashboardAlert("Invalid Instagram URL");
             return;
         }
 
         if (!isValidUrl(smDiscord) && smDiscord.length != 0) {
-            alert("Invalid Discord URL");
+            openDashboardAlert("Invalid Discord URL");
             return;
         }
 
         if (!isValidUrl(smTiktok) && smTiktok.length != 0) {
-            alert("Invalid Tik-Tok URL");
+            openDashboardAlert("Invalid Tik-Tok URL");
             return;
         }
 
@@ -73,7 +84,7 @@ $(document).ready(function() {
 
         // Check that length of description isn't too long
         if (description.length > 500) {
-            alert("Description should be 500 characters or less");
+            openDashboardAlert("Description should be 500 characters or less");
             return;
         }
 
@@ -95,11 +106,13 @@ $(document).ready(function() {
             contentType: "application/json",
             data: JSON.stringify(data),
             success: function(response) {
-                alert("Settings saved successfully!");
+                openDashboardAlert('Settings saved successfully!');
             },
             error: function(error) {
-                alert("An error occurred while saving settings, please try again later.");
+                openDashboardAlert(error.responseJSON.message);
             }
         });
     });
 });
+
+
