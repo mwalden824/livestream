@@ -23,6 +23,27 @@
         {{ username }}'s Dashboard
     </div>
     <div class="dashboard-elements">
+        <div class="dashboard-element" id="dashboard-profile-pic-banner">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-profile-pic" id="upload-area-profile-pic">
+                    <div class="dashboard-element-row-profile-pic-avatar">
+                        <label for="profile-picture" id="profile-picture-label-id">
+                            <img id="preview-image" src="/storage/{{ username }}/profile-pic.jpg" alt="Profile Picture">
+                        </label>
+                        <input type="file" id="profile-picture-id" name="profile_picture">    
+                    </div>
+                    <div class="dashboard-element-row-profile-pic-avatar-text">
+                        Avatar
+                    </div>
+                </div>
+                <div class="dashboard-element-row-banner" id="upload-area-banner">
+                    <label for="offline-banner" id="offline-banner-label-id">
+                        <img id="preview-banner" src="/storage/{{ username }}/offline-banner.jpg" alt="Offline Banner">
+                    </label>
+                    <input type="file" id="offline-banner-input-id" name="offline_banner">
+                </div>
+            </div>
+        </div>
         <div class="dashboard-element" id="dashboard-url-stream-key">
             <div class="dashboard-element-row">
                 <div class="dashboard-element-row-title">
@@ -123,6 +144,9 @@
     </div>
 <!-- </div> -->
 </main>
+<script type="script">
+    var account_name = {{ username }};
+</script>
 <script src="../static/scripts/dashboard.js"></script>
 {% endblock %}
 

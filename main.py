@@ -6,9 +6,10 @@ from sqlalchemy.sql import func
 import random
 from string import ascii_letters
 from werkzeug.security import generate_password_hash, check_password_hash
-from os import path
+from os import path, mkdir
 import hashlib
 import socket
+from PIL import Image
 
 DB_NAME = "database.db"
 # STREAM_HOST_NAME = socket.gethostbyname(socket.gethostname())
@@ -18,6 +19,7 @@ STREAM_PORT = 1935
 STREAM_APP_NAME = "live"
 STREAM_SERVER_URL = HOST_NAME + ":" + str(STREAM_PORT)
 APP_PORT = 5001
+STORAGE_PATH = "storage"
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "mysupersecretkeybitch"
@@ -46,6 +48,10 @@ if not path.exists("instance/"+DB_NAME):
         # db.create_all(app=app)
         print("Database created")
 
+# Create storage folder where all user data will be stored
+if not path.exists(STORAGE_PATH):
+    mkdir(STORAGE_PATH)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -57,6 +63,15 @@ socketio = SocketIO(app)
 
 # NOTE:  Should probably use redis database if app gets big
 rooms = {}
+
+def valid_extension(filename):
+    _, extension = path.splitext(filename)
+    valid_extensions = ['.png', '.jpg', '.jpeg']
+    
+    if extension.lower() in valid_extensions:
+        return True
+    else:
+        return False
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -129,6 +144,7 @@ def signup():
     else:
         # Calculate a hash from the username and password with sha256 and 
         # keep first 20 characters to use for stream key
+        mkdir(STORAGE_PATH + "/" + username)
         stream_key = hashlib.sha256((username + password).encode()).hexdigest()[0:19]
         new_user = User(username=username, email=email, password=generate_password_hash(password, method='sha256'), streamKey=stream_key)
         db.session.add(new_user)
@@ -189,6 +205,65 @@ def save_settings():
     db.session.commit()
 
     return jsonify({"message": "Settings saved"}), 200
+
+# Route only used for default profile and banner images
+# @app.route("/storage/<filename>")
+# def view_default(filename):
+#     filepath = path.join(STORAGE_PATH, filename)
+#     return send_file(filepath)
+
+@app.route("/storage/<streamer>/<filename>")
+def view_file(streamer, filename):
+    filepath = path.join(STORAGE_PATH, streamer)
+    fname = path.join(filepath, filename)
+    defname = path.join(STORAGE_PATH, "default-"+filename)
+    if path.exists(fname):
+        return send_file(fname)
+    else:
+        return send_file(defname)
+
+@app.route('/upload', methods=['POST'])
+@login_required
+def upload():
+    uploadType = request.form.get('type')
+
+    if 'file' not in request.files:
+        return jsonify({"message": "No file part"}), 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({"message": "No selected file"}), 400
+    
+    if not valid_extension(file.filename):
+        return jsonify({"message": "Not a valid image file"}), 400
+
+    img = Image.open(file)
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    width, height = img.size
+    if uploadType == 'profile-pic':
+        if width != height:
+            return jsonify({"message": "Profile picture needs to have a 1:1 aspect ratio."}), 400
+        img.resize((256, 256))
+        filePath = STORAGE_PATH + "/" + current_user.username + "/profile-pic.jpg"
+    elif uploadType == 'offline-banner':
+        aspect_ratio = width / height
+        target_aspect_ratio = 16 / 9
+        tolerance = 0.05
+
+        if not abs(aspect_ratio - target_aspect_ratio) <= tolerance:
+            return jsonify({"message": "Offline banner needs to have a 16:9 aspect ratio."}), 400
+
+        img.resize((1920, 1080))
+        filePath = STORAGE_PATH + "/" + current_user.username + "/offline-banner.jpg"
+    else:
+        return jsonify({"message": "Undefined upload type"}), 400
+
+    if file:
+        # file.save(filePath)
+        img.save(filePath, format='JPEG', quality=90)
+        return jsonify({"message": "File uploaded successfully"}), 200
 
 @app.route("/logout")
 def logout():

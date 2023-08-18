@@ -27,14 +27,15 @@
             <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i>
         </div>
         <div class="image-container">
-            <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder">
+            <!-- <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder"> -->
+            <img src="/storage/{{ username }}/offline-banner.jpg" id="offline-image-placeholder">
             <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i>
         </div>
     </div>
     <div class="profile">
         <div class="info-section">
             <div class="profile-picture">
-                <img src="../static/resources/profile-pic-placeholder.png" id="profile-pic">
+                <img src="/storage/{{ username }}/profile-pic.jpg" id="profile-pic">
             </div>
             <div class="name-title-tags">
                 <div class="username">

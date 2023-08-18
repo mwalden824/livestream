@@ -38,9 +38,12 @@
                         <div id="profile-menu-click-area">
                             <div id="profile-menu" class="profile-menu">
                                 <ul>
-                                    <li><a href="/{{ current_user.username }}">Channel</a></li>
+                                    <!-- <li><a href="/{{ current_user.username }}">Channel</a></li>
                                     <li><a href="/{{ current_user.username }}/dashboard">Dashboard</a></li>
-                                    <li><a href="/logout">Logout</a></li>
+                                    <li><a href="/logout">Logout</a></li> -->
+                                    <a href="/{{ current_user.username }}"><li>Channel</li></a>
+                                    <a href="/{{ current_user.username }}/dashboard"><li>Dashboard</li></a>
+                                    <a href="/logout"><li>Logout</li></a>
                                 </ul>
                             </div>
                             <script>
@@ -59,7 +62,8 @@
                                 //     }
                                 // });
                             </script>
-                            <img src="../static/resources/profile-pic-placeholder.png" alt="Profile Picture" id="profile-pic-placeholder" onclick="toggleProfileMenu()">
+                            <!-- <img src="../static/resources/profile-pic-placeholder.png" alt="Profile Picture" id="profile-pic-placeholder" onclick="toggleProfileMenu()"> -->
+                            <img src="/storage/{{ current_user.username }}/profile-pic.jpg" alt="Profile Picture" id="profile-pic-placeholder" onclick="toggleProfileMenu()">
                         </div>
                     </div>
                 {% else %}

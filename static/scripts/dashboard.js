@@ -115,4 +115,69 @@ $(document).ready(function() {
     });
 });
 
+document.getElementById('profile-picture-id').addEventListener('change', function(event) {
+    const previewImage = document.getElementById('preview-image');
+    const selectedFile = event.target.files[0];
+    console.log("Profile picture was changed");
+
+    if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('type', 'profile-pic')
+
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                openDashboardAlert('Profile Picture updated.');
+                previewImage.src = URL.createObjectURL(selectedFile);
+            },
+            error: function(error) {
+                openDashboardAlert(error.responseJSON.message);
+            }
+        });
+    } else {
+        // previewImage.src = "/storage/default-profile-pic.jpg";
+    }
+});
+
+document.getElementById('offline-banner-input-id').addEventListener('change', function(event) {
+    const previewImage = document.getElementById('preview-banner');
+    const selectedFile = event.target.files[0];
+    console.log("Banner was changed");
+
+    if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('type', 'offline-banner')
+
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                openDashboardAlert('Offline banner updated.');
+                previewImage.src = URL.createObjectURL(selectedFile);
+            },
+            error: function(error) {
+                openDashboardAlert(error.responseJSON.message);
+            }
+        });
+    } else {
+        // previewImage.src = "/storage/default-offline-banner.jpg";
+    }
+});
+
+document.getElementById('upload-area-profile-pic').addEventListener('click', function() {
+    document.getElementById('profile-picture-id').click();
+});
+
+document.getElementById('upload-area-banner').addEventListener('click', function() {
+    document.getElementById('offline-banner-input-id').click();
+});
 

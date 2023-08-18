@@ -1,4 +1,5 @@
 /static/resources/
 /stream/
 /instance/
+/storage/
 main2.py
