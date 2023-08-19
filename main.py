@@ -6,10 +6,14 @@ from sqlalchemy.sql import func
 import random
 from string import ascii_letters
 from werkzeug.security import generate_password_hash, check_password_hash
-from os import path, mkdir
+from os import path, mkdir, listdir
 import hashlib
 import socket
 from PIL import Image
+import subprocess
+import shutil
+import time
+import threading
 
 DB_NAME = "database.db"
 # STREAM_HOST_NAME = socket.gethostbyname(socket.gethostname())
@@ -20,6 +24,8 @@ STREAM_APP_NAME = "live"
 STREAM_SERVER_URL = HOST_NAME + ":" + str(STREAM_PORT)
 APP_PORT = 5001
 STORAGE_PATH = "storage"
+STREAM_PATH = "stream/"
+THUMBNAIL_CREATION_PERIOD = 15 # seconds
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "mysupersecretkeybitch"
@@ -73,9 +79,50 @@ def valid_extension(filename):
     else:
         return False
 
+def create_latest_thumbnails():
+    while True:
+        for folder_name in listdir(STREAM_PATH):
+            folder_path = path.join(STREAM_PATH, folder_name)
+
+            if path.isdir(folder_path):
+                # Call ffmpeg and create thumbnail for this stream
+                ffmpeg_cmd = [
+                    'ffmpeg',
+                    '-y',
+                    '-i', folder_path+'/index.m3u8',
+                    '-s', '480x270',
+                    '-vframes', '1',
+                    '-f', 'image2',
+                    folder_path+'/thumbnail.jpg',
+                    '-hide_banner',
+                    '-loglevel', 'panic'
+                ]
+
+                try:
+                    subprocess.run(ffmpeg_cmd, check=True)
+                except subprocess.CalledProcessError as e:
+                    print("Error executing FFmpeg command:", e)
+
+                    try:
+                        shutil.rmtree(folder_path)
+                    except OSError as e:
+                        print(f"Error deleting '{path}': {e}")
+
+        # print("Thumbnail thread running")
+        time.sleep(THUMBNAIL_CREATION_PERIOD)
+
 @app.route("/", methods=["POST", "GET"])
 def home():
-    return render_template("home.html")
+    online_streamers = []
+    for folder_name in listdir(STREAM_PATH):
+        folder_path = path.join(STREAM_PATH, folder_name)
+        tn_path = path.join(folder_path, "thumbnail.jpg")
+        if path.isdir(folder_path) and path.exists(tn_path):
+            user = User.query.filter_by(streamKey=folder_name).first()
+            username = user.username
+            online_streamers.append(username)
+
+    return render_template("home.html", streamers_online=online_streamers)
 
 @app.route("/<streamer>", methods=["POST", "GET"])
 def streamname(streamer):
@@ -284,6 +331,15 @@ def serve_playlist(streamer):
     except:
         return "Playlist not found", 404
 
+@app.route('/stream/<streamer>/thumbnail.jpg')
+def serve_thumbnail(streamer):
+    user = User.query.filter_by(username=streamer).first()
+    streamKey = user.streamKey
+    try:
+        return send_file('stream/'+streamKey+'/thumbnail.jpg', mimetype='image/jpeg')
+    except:
+        return "Thumbnail not found", 404
+
 @app.route('/stream/<streamer>/<int:segment_number>.ts')
 def serve_segment(streamer, segment_number):
     user = User.query.filter_by(username=streamer).first()
@@ -302,6 +358,23 @@ def auth_stream():
             return "Stream Denied", 406
     else:
         return "Error", 404
+    
+#TODO: Write a callback for when streamer stops publishing that deletes their stream directory with the thumbnail
+@app.route('/stream-done', methods=['POST'])
+def done_stream():
+    if request.method == 'POST':
+        stream_key = request.form.get('name')
+        # user = User.query.filter_by(streamKey=stream_key).first()
+        path = STREAM_PATH + stream_key
+
+        try:
+            shutil.rmtree(path)
+            return "Stream Contents Deleted", 200
+        except OSError as e:
+            print(f"Error deleting '{path}': {e}")
+            return "Error Deleting Stream Contents", 400
+
+    return "Error Deleting Stream Contents", 400
 
 @socketio.on("message")
 def message(data):
@@ -343,5 +416,6 @@ def disconnect():
 
 
 if __name__ == "__main__":
+    thread = threading.Thread(target=create_latest_thumbnails)
+    thread.start()
     socketio.run(app, host='0.0.0.0', port=APP_PORT)
-

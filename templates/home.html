@@ -1,39 +1,35 @@
 {% extends "base.html" %}
 {% block title %}Leecher{% endblock %}
 {% block content %}
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<p>This is the homepage that will eventually display the current streams that are live in some form, and it's the main entry point to the website.  This is also where you are taken when you click the logo.</p>
+<main id="dashboard">
+    <div class="main-page-title">
+        <p>Browse Leech Streams</p>
+    </div>
+    <div class="online-streams">
+    {% for online_stream in streamers_online %}
+        <a href="/{{ online_stream }}">
+            <div class="online-stream">
+                <div class="online-stream-thumbnail">
+                    <img src="/stream/{{ online_stream }}/thumbnail.jpg">
+                </div>
+                <div class="online-stream-info">
+                    <div class="online-stream-profile-pic">
+                        <img src="/storage/{{ online_stream }}/profile-pic.jpg">
+                    </div>
+                    <div class="online-stream-info-text">
+                        <div class="online-stream-info-text-streamer">
+                            {{ online_stream }}
+                        </div>
+                        <div class="online-stream-info-text-title">
+                            Title of Stream goes here
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+    </div>
+</main>
 {% endblock %}
 {% block javascript %}
 {% endblock %}
