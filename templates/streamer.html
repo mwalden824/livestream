@@ -18,7 +18,7 @@
             {% endif %}
         </div>
     </div>
-</div>    
+</div>
 <main id="main">
      <!-- Main content goes here -->
     <div id="content">
@@ -55,15 +55,26 @@
             </div>
             <div class="follow-sub-viewers">
                 <div class="follow-sub">
-                    <div class="follow-sub-div">
-                        <button class="follow-sub-btn">Follow</button>
-                    </div>
-                    <div class="follow-sub-div">
-                        <button class="follow-sub-btn">Subscribe</button>
-                    </div>
+                    {% if showFollowSubBtn and current_user.is_authenticated %}
+                        <div class="follow-sub-div">
+                            {% if followed %}
+                                <button class="follow-sub-btn" id="follow-button">Unfollow</button>
+                            {% else %}
+                                <button class="follow-sub-btn" id="follow-button">Follow</button>
+                            {% endif %}
+                        </div>
+                        <div class="follow-sub-div">
+                            <button class="follow-sub-btn">Subscribe</button>
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="viewers">
-                    1,876 Viewers
+                    <div class="viewers-number" id="viewers-number-id">
+                        0
+                    </div>
+                    <div class="viewers-icon">
+                        <img src="../static/resources/icons/viewers-icon.png" id="viewers-icon-img">
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,7 +84,7 @@
                     About {{ username }}
                 </div>
                 <div class="followers">
-                    67k Followers
+                    {{ followerCount }} Followers
                 </div>
                 <div class="description">
                     {{ userDescription }}

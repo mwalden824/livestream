@@ -60,6 +60,7 @@ function showChat() {
 var socketio = io();
 
 const messages = document.getElementById('chatMessages');
+const viewerCount = document.getElementById('viewers-number-id');
 // messages.scrollTop = messages.scrollHeight;
 
 const createMessage = (name, msg) => {
@@ -73,9 +74,14 @@ const createMessage = (name, msg) => {
 };
 
 socketio.on("message", (data) => {
-    console.log("A message has been transmitted");
-    createMessage(data.name, data.message);
-    messages.scrollTop = messages.scrollHeight;
+    // console.log("A message has been transmitted");
+    if (data.type === "chat") {
+        createMessage(data.name, data.message);
+        messages.scrollTop = messages.scrollHeight;    
+    }
+    else { // "count" 
+        viewerCount.innerHTML = data.message;
+    }
 });
 
 const sendMessage = () => {
@@ -89,5 +95,36 @@ const msgTextBox = document.getElementById('chatTextBox');
 msgTextBox.addEventListener("keydown", function (e) {
     if (e.code == "Enter") {
         sendMessage();
+    }
+});
+
+var followButton = document.getElementById("follow-button");
+
+followButton.addEventListener("click", function() {
+    if (followButton.innerHTML === "Follow") {
+        $.ajax({
+            url: '/follow/'+streamPath,
+            type: 'POST',
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                followButton.innerHTML = "Unfollow";
+            },
+            error: function(error) {
+            }
+        });    
+    }
+    else { // Unfollow
+        $.ajax({
+            url: '/unfollow/'+streamPath,
+            type: 'POST',
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                followButton.innerHTML = "Follow";
+            },
+            error: function(error) {
+            }
+        });    
     }
 });

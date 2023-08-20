@@ -26,6 +26,7 @@ APP_PORT = 5001
 STORAGE_PATH = "storage"
 STREAM_PATH = "stream/"
 THUMBNAIL_CREATION_PERIOD = 15 # seconds
+DEFAULT_DESCRIPTIOIN = "Streamer's description goes here."
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "mysupersecretkeybitch"
@@ -33,7 +34,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 db = SQLAlchemy(app)
 # db.init_app(app)
 
-default_descriptioin = "Streamer's description goes here."
+
+# Intermediate table for the many-to-many relationship
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('following_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -45,9 +53,10 @@ class User(db.Model, UserMixin):
     instagramUrl = db.Column(db.String(40), default="")
     discordUrl = db.Column(db.String(40), default="")
     tiktokUrl = db.Column(db.String(40), default="")
-    description = db.Column(db.String(500), default=default_descriptioin)
+    description = db.Column(db.String(500), default=DEFAULT_DESCRIPTIOIN)
 
-# if not path.exists(DB_NAME):
+    followers = db.relationship('User', secondary=followers, primaryjoin=(followers.c.follower_id == id), secondaryjoin=(followers.c.following_id == id), backref=db.backref('following', lazy='dynamic'), lazy='dynamic')
+
 if not path.exists("instance/"+DB_NAME):
     with app.app_context():
         db.create_all()
@@ -127,7 +136,21 @@ def home():
 @app.route("/<streamer>", methods=["POST", "GET"])
 def streamname(streamer):
     user = User.query.filter_by(username=streamer).first()
+    followers = user.followers.all()
+    num_followers = len(followers)
+    showFollowSub = True
+    isFollowing = False
     if user:
+        if current_user.is_authenticated:
+            if user in current_user.following.all():
+                isFollowing = True
+            else:
+                isFollowing = False
+            if user == current_user:
+                showFollowSub = False
+        else:
+            showFollowSub = False
+
         session["room"] = str(streamer)
         if str(streamer) not in rooms:
             # session["room"] = str(streamer)
@@ -138,9 +161,54 @@ def streamname(streamer):
             msgs=rooms[streamer]["messages"], 
             username=streamer, 
             userDescription=user.description,
-            smLinks=[user.youtubeUrl, user.twitterUrl, user.instagramUrl, user.discordUrl, user.tiktokUrl])
+            smLinks=[user.youtubeUrl, user.twitterUrl, user.instagramUrl, user.discordUrl, user.tiktokUrl],
+            followed=isFollowing,
+            showFollowSubBtn=showFollowSub,
+            followerCount=str(num_followers))
     else:
         return render_template("no-account.html", username=streamer)
+
+@app.route('/follow/<streamer>', methods=['POST'])
+@login_required
+def follow(streamer):
+    target_user = User.query.filter_by(username=streamer).first()
+    if target_user:
+        if target_user == current_user:
+            return jsonify({"message": "User can't follow theirself"}), 420
+        target_user.followers.append(current_user)
+        db.session.commit()
+
+        # print("FOLLOW: Current user is following: ")
+        # for usern in current_user.following.all():
+        #     print(str(usern.username))
+
+        # print("FOLLOW: Target user is following: ")
+        # for usern in target_user.following.all():
+        #     print(str(usern.username))
+
+        return jsonify({"message": "Successfully Added Follow"}), 200
+
+    return jsonify({"message": "Target Username Does Not Exist"}), 404
+
+@app.route('/unfollow/<streamer>', methods=['POST'])
+@login_required
+def unfollow(streamer):
+    target_user = User.query.filter_by(username=streamer).first()
+    if target_user:
+        target_user.followers.remove(current_user)
+        db.session.commit()
+
+        # print("UNFOLLOW: Current user is following: ")
+        # for usern in current_user.following.all():
+        #     print(str(usern.username))
+
+        # print("UNFOLLOW: Target user is following: ")
+        # for usern in target_user.following.all():
+        #     print(str(usern.username))
+
+        return jsonify({"message": "Successfully Deleted Follow"}), 200
+
+    return jsonify({"message": "Target Username Does Not Exist"}), 404
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -308,15 +376,12 @@ def upload():
         return jsonify({"message": "Undefined upload type"}), 400
 
     if file:
-        # file.save(filePath)
         img.save(filePath, format='JPEG', quality=90)
         return jsonify({"message": "File uploaded successfully"}), 200
 
 @app.route("/logout")
 def logout():
     logout_user()
-    # print(request.referrer[-9:])
-    # print(request.referrer[0:22])
     if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" and len(request.referrer) > 31:
         return redirect("/")
     else:
@@ -359,7 +424,6 @@ def auth_stream():
     else:
         return "Error", 404
     
-#TODO: Write a callback for when streamer stops publishing that deletes their stream directory with the thumbnail
 @app.route('/stream-done', methods=['POST'])
 def done_stream():
     if request.method == 'POST':
@@ -380,13 +444,14 @@ def done_stream():
 def message(data):
     room = session.get("room")
     content = {
+        "type": "chat",
         "name": session.get("name"),
         "message": data["data"]
     }
 
     send(content, to=room)
     rooms[room]["messages"].append(content)
-    print(f"{session.get('name')} said: {data['data']}")
+    # print(f"{session.get('name')} said: {data['data']}")
 
 @socketio.on("connect")
 def connect(auth):
@@ -402,6 +467,15 @@ def connect(auth):
     rooms[str(room)]["members"] += 1
     # print(f"{name} joined {room}'s room")
 
+    # Update live viewer count
+    content = {
+        "type": "count",
+        "name": "",
+        "message": rooms[str(room)]["members"]
+    }
+    send(content, to=room)
+
+
 @socketio.on("disconnect")
 def disconnect():
     name = session.get("name")
@@ -413,6 +487,14 @@ def disconnect():
 
     rooms[str(room)]["members"] -= 1
     # print(f"{name} has left {room}'s room")
+
+    # Update live viewer count
+    content = {
+        "type": "count",
+        "name": "",
+        "message": rooms[str(room)]["members"]
+    }
+    send(content, to=room)
 
 
 if __name__ == "__main__":

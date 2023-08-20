@@ -470,9 +470,27 @@ body {
 
 .viewers {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: right;
+    align-items: right;
     font-size: 20px;
+    padding: 5px;
+    font-weight: bolder;
+    font-family: 'Courier New', Courier, monospace;
+    color: white;
+}
+
+.viewers-number {
+    /* padding: 5px; */
+    margin-right: 5px;
+}
+
+.viewers-icon {
+    /* padding: 5px; */
+    margin-right: 5px;
+}
+
+#viewers-icon-img {
+    width: 20px;
 }
 
 .about-section {
