@@ -78,6 +78,7 @@ socketio = SocketIO(app)
 
 # NOTE:  Should probably use redis database if app gets big
 rooms = {}
+liveStreamers = []
 
 def valid_extension(filename):
     _, extension = path.splitext(filename)
@@ -89,9 +90,15 @@ def valid_extension(filename):
         return False
 
 def create_latest_thumbnails():
+    global liveStreamers
     while True:
         for folder_name in listdir(STREAM_PATH):
             folder_path = path.join(STREAM_PATH, folder_name)
+
+            with app.app_context():
+                user = User.query.filter_by(streamKey=folder_name).first()
+                if user not in liveStreamers:
+                    liveStreamers.append(user)
 
             if path.isdir(folder_path):
                 # Call ffmpeg and create thumbnail for this stream
@@ -114,11 +121,40 @@ def create_latest_thumbnails():
 
                     try:
                         shutil.rmtree(folder_path)
+                        if user in liveStreamers:
+                            liveStreamers.remove(user)
                     except OSError as e:
                         print(f"Error deleting '{path}': {e}")
 
-        # print("Thumbnail thread running")
         time.sleep(THUMBNAIL_CREATION_PERIOD)
+
+@app.route("/streamers_update", methods=['POST'])
+# @login_required
+def streamers_update():
+    global liveStreamers
+    onlineStreamList = []
+    offlineStreamList = []
+    if current_user.is_authenticated:
+        following = current_user.following.all()
+
+        for i, followed in enumerate(following):
+            if i > 10:
+                break
+            if followed in liveStreamers:
+                print("Added follower to onlineStreamList")
+                onlineStreamList.append(followed.username)
+            else:
+                offlineStreamList.append(followed.username)
+
+        return jsonify(online=onlineStreamList, offline=offlineStreamList), 200
+    else:
+        # Return list of online streamers clipped to 10 for now
+        for i, streamer in enumerate(liveStreamers):
+            if i > 10:
+                break
+            onlineStreamList.append(streamer.username)
+
+        return jsonify(online=onlineStreamList), 200
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -321,12 +357,6 @@ def save_settings():
 
     return jsonify({"message": "Settings saved"}), 200
 
-# Route only used for default profile and banner images
-# @app.route("/storage/<filename>")
-# def view_default(filename):
-#     filepath = path.join(STORAGE_PATH, filename)
-#     return send_file(filepath)
-
 @app.route("/storage/<streamer>/<filename>")
 def view_file(streamer, filename):
     filepath = path.join(STORAGE_PATH, streamer)
@@ -354,15 +384,35 @@ def upload():
         return jsonify({"message": "Not a valid image file"}), 400
 
     img = Image.open(file)
-    if img.mode != 'RGB':
-        img = img.convert('RGB')
+    overlay = Image.open(STORAGE_PATH + "/default-profile-pic-offline-overlay.png")
+    overlay = overlay.resize((256, 256))
     width, height = img.size
     if uploadType == 'profile-pic':
         if width != height:
             return jsonify({"message": "Profile picture needs to have a 1:1 aspect ratio."}), 400
-        img.resize((256, 256))
+        img = img.resize((256, 256))
         filePath = STORAGE_PATH + "/" + current_user.username + "/profile-pic.jpg"
+
+        # Create Offline profile Pic
+        filePathOffline = STORAGE_PATH + "/" + current_user.username + "/profile-pic-offline.jpg"
+
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+        if file:
+            img.save(filePath, format='JPEG', quality=90)
+
+            img = img.convert("L")
+            img = img.convert('RGBA')
+            overlay = overlay.convert('RGBA')
+            img.paste(overlay, (0, 0), overlay)
+            img = img.convert('RGB')
+            img.save(filePathOffline, format='JPEG', quality=90)
+
+            return jsonify({"message": "File uploaded successfully"}), 200
     elif uploadType == 'offline-banner':
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
         aspect_ratio = width / height
         target_aspect_ratio = 16 / 9
         tolerance = 0.05
@@ -372,12 +422,12 @@ def upload():
 
         img.resize((1920, 1080))
         filePath = STORAGE_PATH + "/" + current_user.username + "/offline-banner.jpg"
+
+        if file:
+            img.save(filePath, format='JPEG', quality=90)
+            return jsonify({"message": "File uploaded successfully"}), 200
     else:
         return jsonify({"message": "Undefined upload type"}), 400
-
-    if file:
-        img.save(filePath, format='JPEG', quality=90)
-        return jsonify({"message": "File uploaded successfully"}), 200
 
 @app.route("/logout")
 def logout():
@@ -414,25 +464,30 @@ def serve_segment(streamer, segment_number):
 
 @app.route('/stream-auth', methods=['POST'])
 def auth_stream():
+    global liveStreamers
     if request.method == 'POST':
         stream_key = request.form.get('name')
         user = User.query.filter_by(streamKey=stream_key).first()
         if user:
+            liveStreamers.append(user)
             return "Stream Allowed", 200
         else:
             return "Stream Denied", 406
     else:
         return "Error", 404
-    
+
 @app.route('/stream-done', methods=['POST'])
 def done_stream():
+    global liveStreamers
     if request.method == 'POST':
         stream_key = request.form.get('name')
-        # user = User.query.filter_by(streamKey=stream_key).first()
+        user = User.query.filter_by(streamKey=stream_key).first()
+
         path = STREAM_PATH + stream_key
 
         try:
             shutil.rmtree(path)
+            liveStreamers.remove(user)
             return "Stream Contents Deleted", 200
         except OSError as e:
             print(f"Error deleting '{path}': {e}")

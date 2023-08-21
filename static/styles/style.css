@@ -142,6 +142,7 @@ body {
 #icon {
     /* margin-right: 15px; */
     width: 30px;
+    border-radius: 50%;
 }
 
 .streamer-row {
@@ -916,4 +917,9 @@ textarea {
     color: white;
     font-weight: bold;
     padding: 5px;
+}
+
+.streamers a {
+    text-decoration: none;
+    color: white;
 }
