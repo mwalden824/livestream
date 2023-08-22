@@ -19,8 +19,8 @@ header {
 
 .navbar {
     display: flex;
-    /* align-items: center; */
-    align-items: left;    
+    align-items: center;
+    /* align-items: left;     */
     justify-content: space-between;
     margin: 0;
 }
@@ -29,6 +29,7 @@ header {
     display: flex;
     margin-top: 5px;
     margin-left: 5px;
+    text-align: left;
 }
 
 .logo-icon {
@@ -60,11 +61,16 @@ header {
 }
 
 .search {
-    flex-grow: 1;
+    display: flex;
     text-align: center;
     align-items: center;
     justify-content: center;
     margin-top: 10px;
+    text-align: center;
+}
+
+.search form {
+    display: block;
 }
 
 .search input[type="text"] {
@@ -233,7 +239,6 @@ body {
     display: none;
 }
 
-
 #offline-image-placeholder {
     width: 100%;
     display: none;
@@ -322,6 +327,7 @@ body {
 .navbar-right {
     display: flex;
     margin-right: 20px;
+    text-align: right;
 }
 
 .nav-button {
@@ -923,3 +929,97 @@ textarea {
     text-decoration: none;
     color: white;
 }
+
+.search_thumbnail img {
+    /* width: 150px; */
+    height: 100px;
+}
+
+.search_profile_pic img {
+    /* width: 150px; */
+    height: 100px;
+    border-radius: 50%;
+}
+
+.search_element {
+    display: flex;
+}
+
+.search_profile_pic {
+    /* flex: 1; */
+    align-items: right;
+    justify-content: right;
+    text-align: right;
+    width: 110px;
+}
+
+.search_streamer_info {
+    flex: 3;
+    text-align: left;
+    justify-content: left;
+    align-items: left;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.search_streamer_info_offline {
+    flex: 5;
+    text-align: left;
+    justify-content: left;
+    align-items: left;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.streamer-row {
+    display: flex;
+}
+
+.search_streamer {
+    font-size: 30px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bolder;
+    flex-grow: 1;
+}
+
+.streamer-online {
+    border-radius: 3px;
+    background-color: #e23439;
+    color: white;
+    height: 20px;
+    padding: 3px 6px 3px 6px;
+}
+
+.streamer-offline {
+    border-radius: 3px;
+    background-color: #0d121a;
+    color: white;
+    /* height: auto; */
+    height: 20px;
+    padding: 3px 6px 3px 6px;
+}
+
+.streamer_info {
+    margin-top: 10px;
+}
+
+.dashboard-elements a {
+    text-decoration: none;
+    color: white;
+}
+
+.search-result-element {
+    background-color: #3A4655;
+    border-radius: 5px;
+    align-items: center;
+    padding: 10px;
+    margin: 10px;
+    text-align: center;
+    justify-content: center;
+}
+
+.search-result-element:hover {
+    background-color: #667e9b;
+}
+
+

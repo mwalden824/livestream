@@ -34,7 +34,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 db = SQLAlchemy(app)
 # db.init_app(app)
 
-
 # Intermediate table for the many-to-many relationship
 followers = db.Table(
     'followers',
@@ -494,6 +493,31 @@ def done_stream():
             return "Error Deleting Stream Contents", 400
 
     return "Error Deleting Stream Contents", 400
+
+@app.route('/search', methods=['POST'])
+def search():
+    if request.method == 'POST':
+        query = request.form.get('query')
+        results = db.session.query(User).filter(
+            (
+                User.username.like(f"%{query}%") |
+                User.description.like(f"%{query}%")
+            )
+        ).all()
+        # print(query)
+        # print(results)
+
+        search_results = []
+        for result in results:
+            if result in liveStreamers:
+                search_results.append((result.username, True, "Stream Title Goes Here"))
+            else:
+                search_results.append((result.username, False, result.description))
+
+        return render_template("search.html", searchResult=search_results), 200
+
+    return "Error with Search", 400
+
 
 @socketio.on("message")
 def message(data):

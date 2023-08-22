@@ -30,8 +30,10 @@
                 </div>    
             </a>
             <div class="search">
-                <input type="text" placeholder="Search" id="search-textbox">
-                <button type="button" id="search-button" class="nav-button">Search</button>
+                <form id="search-form" action="/search" method="post" class="search-form-class">
+                    <input type="text" name="query" placeholder="Search" id="search-textbox" class="search-element">
+                    <button type="submit" id="search-button" class="nav-button" type="submit" class="search-element">Search</button>
+                </form>
             </div>
             <div class="navbar-right">
                 {% if current_user.is_authenticated %}

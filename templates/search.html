@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+<main id="dashboard">
+    <div class="dashboard-title">
+        Search Results
+    </div>
+    <div class="dashboard-elements">
+        {% for streamer, status, info in searchResult %}
+            {% if status %}
+                <a href="/{{ streamer }}">
+                    <div class="search-result-element">
+                        <div class="search_element">
+                            <div class="search_thumbnail">
+                                <img src="/stream/{{ streamer }}/thumbnail.jpg">
+                            </div>
+                            <div class="search_streamer_info">
+                                <div class="streamer-row">
+                                    <div class="search_streamer">
+                                        {{ streamer }}
+                                    </div>
+                                    <div class="streamer-online">
+                                        LIVE
+                                    </div>    
+                                </div>
+                                <div class="streamer_info">
+                                    {{ info }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <a href="/{{ streamer }}">
+                    <div class="search-result-element">
+                        <div class="search_element">
+                            <div class="search_profile_pic">
+                                <img src="/storage/{{ streamer }}/profile-pic.jpg">
+                            </div>
+                            <div class="search_streamer_info_offline">
+                                <div class="streamer-row">
+                                    <div class="search_streamer">
+                                        {{ streamer }}
+                                    </div>
+                                    <div class="streamer-offline">
+                                        OFFLINE
+                                    </div>    
+                                </div>
+                                <div class="streamer_info">
+                                    {{ info }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</main>
+<script type="script">
+    var account_name = {{ username }};
+</script>
+<!-- <script src="../static/scripts/dashboard.js"></script> -->
+{% endblock %}
+
+
+
