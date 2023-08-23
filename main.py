@@ -248,8 +248,9 @@ def unfollow(streamer):
 @app.route("/login", methods=['POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username-login')
-        password = request.form.get('password-login')
+        data = request.json
+        username = data["username-login"]
+        password = data["password-login"]
 
         user = User.query.filter_by(username=username).first()
         if user:
@@ -257,53 +258,54 @@ def login():
                 print("Logged in Successfully")
                 login_user(user, remember=True)
                 session["name"] = str(user.username)
-                return redirect(request.referrer)
+                return redirect(request.referrer), 200
             else:
-                # flash('')
                 print("Incorrect Password")
+                return jsonify({"message": "Incorrect password"}), 406
         else:
             print("Username doesn't exist")
-            # flash('')
+            return jsonify({"message": "Username doesn't exist"}), 404
 
-    return 'Authentication Error'
+    return jsonify({"message": "Authentication Error"}), 400
 
 @app.route("/signup", methods=['POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form.get('username-signup')
-        email = request.form.get('email-signup')
-        password = request.form.get('password-signup')
-        password2 = request.form.get('password2-signup')
+        data = request.json
+        username = data["username-signup"]
+        email = data["email-signup"]
+        password = data["password-signup"]
+        password2 = data["password2-signup"]
 
-    user = User.query.filter_by(email=email).first()
-    if user:
-        # flash('Email already exists.')
-        print('Email already exists')
-    elif len(email) < 4:
-        # flash('')
-        print('Email too short')
-    elif len(username) < 4:
-        # flash('')
-        print('Username too short')
-    elif password != password2:
-        # flash('')
-        print("Passwords don't match")
-    elif len(password) < 8:
-        # flash('')
-        print('password too short')
-    else:
-        # Calculate a hash from the username and password with sha256 and 
-        # keep first 20 characters to use for stream key
-        mkdir(STORAGE_PATH + "/" + username)
-        stream_key = hashlib.sha256((username + password).encode()).hexdigest()[0:19]
-        new_user = User(username=username, email=email, password=generate_password_hash(password, method='sha256'), streamKey=stream_key)
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user, remember=True)
-        print('Account created')
-        return redirect(request.referrer)
-    
-    return 'Error in Account Creation', 404
+        user = User.query.filter_by(email=email).first()
+        if user:
+            print('Email already exists')
+            return jsonify({"message": "Email already exists."}), 409
+        elif len(email) < 4:
+            print('Email too short')
+            return jsonify({"message": "Email too short."}), 407
+        elif len(username) < 4:
+            print('Username too short')
+            return jsonify({"message": "Username too short."}), 405
+        elif password != password2:
+            print("Passwords don't match")
+            return jsonify({"message": "Passwords don't match."}), 403
+        elif len(password) < 8:
+            print('password too short')
+            return jsonify({"message": "Password too short."}), 401
+        else:
+            # Calculate a hash from the username and password with sha256 and 
+            # keep first 20 characters to use for stream key
+            mkdir(STORAGE_PATH + "/" + username)
+            stream_key = hashlib.sha256((username + password).encode()).hexdigest()[0:19]
+            new_user = User(username=username, email=email, password=generate_password_hash(password, method='sha256'), streamKey=stream_key)
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user, remember=True)
+            print('Account created')
+            return redirect(request.referrer), 200
+
+    return jsonify({"message": "Signup Error"}), 400
 
 @app.route("/<streamer>/dashboard")
 @login_required
