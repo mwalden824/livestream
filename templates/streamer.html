@@ -42,15 +42,15 @@
                     {{ username }}
                 </div>
                 <div class="stream-title">
-                    My very first stream
+                    {{ title_of_stream }}
                 </div>
                 <div class="category-tags">
                     <div class="category">
-                        Chatting
+                        {{ category_of_stream }}
                     </div>
-                    <div class="tag">English</div>
-                    <div class="tag">IRL</div>
-                    <div class="tag">18+</div>
+                    <div id="tags-for-stream">
+                        <div class="tag">English</div>
+                    </div>
                 </div>
             </div>
             <div class="follow-sub-viewers">
@@ -138,8 +138,12 @@
 </main>
 <script type="text/javascript">
     var streamPath = "{{ username }}";
+    var tagsForStream = "{{ tags_of_stream }}";
 </script>
 <script src="../static/scripts/streamer.js"></script>
+<script type="text/javascript">
+    displayTags(tagsForStream);
+</script>
 {% endblock %}
 {% block javascript %}
     {% for msg in msgs %}

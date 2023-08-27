@@ -1,14 +1,8 @@
-// Retrieved from: https://www.freecodecamp.org/news/check-if-a-javascript-string-is-a-url/
-// Function to validate the structure of URLs
-const isValidUrl = urlString=> {
-    var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // validate protocol
-  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // validate domain name
-  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // validate OR ip (v4) address
-  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // validate port and path
-  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // validate query string
-  '(\\#[-a-z\\d_]*)?$','i'); // validate fragment locator
-return !!urlPattern.test(urlString);
-}
+var imageFallback = document.getElementById('offline-image-placeholder');
+var videoElement = document.getElementById('videoElement');
+var videoPlayerElement = document.getElementById('videoPlayer');
+
+var isPlaying = true;
 
 function closeDashboardAlert() {
     document.getElementById('dashboard-alert').style.display = 'none';
@@ -21,92 +15,66 @@ function openDashboardAlert(alertMsg) {
     dashboardAlertElement.style.display = 'block';
 }
 
+videoPlayerElement.addEventListener("error", function() {
+    console.log("Video Error");
+    videoElement.style.display = 'none';
+    imageFallback.style.display = 'block';
+    isPlaying = false;
+});
+var videoPlayer = videojs('videoPlayer', {
+    autoplay: 'muted',
+    muted: true
+});
+videoPlayer.src({
+    src: '/stream/' + streamPath + '/index.m3u8',
+    type: 'application/x-mpegURL'
+});
+videoPlayer.on('error', function (event) {
+    console.log('Video Error');
+    videoElement.style.display = 'none';
+    imageFallback.style.display = 'block';
+    isPlaying = false;
+});
+videoPlayer.play();
+videoPlayer.muted(false);        
+
+function displayTags(inputString) {
+    var tags = inputString.split(" ");
+
+    var tagsHtml = document.getElementById('tags-of-stream');
+    tagsHtml.innerHTML = "";
+
+    if (inputString != "") {
+        for (var i = 0; i < tags.length; i++) {
+            tagsHtml.innerHTML += `
+            <a href='/search/` + String(tags[i]) + `'>
+                <div class='db-tag'>` + String(tags[i]) + `</div>
+            </a>
+            `;
+        }
+    }
+}
+
 $(document).ready(function() {
     $("#dashboard-save-button").click(function () {
-        var oldPassword = $("#old-password-textbox").val();
-        var newPassword = $("#new-password-textbox").val();
-        var newPasswordRetry = $("#new-password-retry-textbox").val();
-
-        // If user is attempting to change password, do checks on input
-        if (oldPassword.length != 0) {
-            // Make sure newpassword and Retry password match
-            if (newPassword != newPasswordRetry) {
-                openDashboardAlert("Retry password doesn't match");
-                return;
-            }
-
-            // Make sure the character count of password is within the limit
-            if (newPassword.length < 8 || newPassword.length > 20) {
-                openDashboardAlert("New Password needs to be between 8 and 20 characters");
-                return;
-            }
-
-            // Make sure the user isn't changing to same password
-            if (newPassword == oldPassword) {
-                openDashboardAlert("New password should be different from old one");
-                return;
-            }
-        }
-
-        var smYoutube = $("#sm-youtube").val();
-        var smTwitter = $("#sm-twitter").val();
-        var smInstagram = $("#sm-instagram").val();
-        var smDiscord = $("#sm-discord").val();
-        var smTiktok = $("#sm-tiktok").val();
-
-        // Make sure social media links are valid urls
-        if (!isValidUrl(smYoutube) && smYoutube.length != 0) {
-            openDashboardAlert("Invalid YouTube URL");
-            return;
-        }
-
-        if (!isValidUrl(smTwitter) && smTwitter.length != 0) {
-            openDashboardAlert("Invalid Twitter URL");
-            return;
-        }
-
-        if (!isValidUrl(smInstagram) && smInstagram.length != 0) {
-            openDashboardAlert("Invalid Instagram URL");
-            return;
-        }
-
-        if (!isValidUrl(smDiscord) && smDiscord.length != 0) {
-            openDashboardAlert("Invalid Discord URL");
-            return;
-        }
-
-        if (!isValidUrl(smTiktok) && smTiktok.length != 0) {
-            openDashboardAlert("Invalid Tik-Tok URL");
-            return;
-        }
-
-        var description = $("#dashboard-description-textbox-id").val();
-
-        // Check that length of description isn't too long
-        if (description.length > 500) {
-            openDashboardAlert("Description should be 500 characters or less");
-            return;
-        }
+        var title = $("#stream-title").val();
+        var tags = $("#stream-tags").val();
+        var category = $("#category-menu").val();
 
         var data = {
-            "old_password": oldPassword,
-            "new_password": newPassword,
-            "new_password_retry": newPasswordRetry,
-            "sm_youtube": smYoutube,
-            "sm_twitter": smTwitter,
-            "sm_instagram": smInstagram,
-            "sm_discord": smDiscord,
-            "sm_tiktok": smTiktok,
-            "description": description
+            "sTitle": String(title),
+            "sTags": String(tags),
+            "sCategory": String(category)
         };
 
         $.ajax({
             type: "POST",
-            url: "/save_settings",
+            url: "/save_stream_settings",
             contentType: "application/json",
             data: JSON.stringify(data),
             success: function(response) {
                 openDashboardAlert('Settings saved successfully!');
+                displayTags(String(tags));
             },
             error: function(error) {
                 openDashboardAlert(error.responseJSON.message);
@@ -115,69 +83,51 @@ $(document).ready(function() {
     });
 });
 
-document.getElementById('profile-picture-id').addEventListener('change', function(event) {
-    const previewImage = document.getElementById('preview-image');
-    const selectedFile = event.target.files[0];
-    console.log("Profile picture was changed");
+var socketio = io();
 
-    if (selectedFile) {
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('type', 'profile-pic')
+const messages = document.getElementById('db-chatMessages');
+// const viewerCount = document.getElementById('viewers-number-id');
+// messages.scrollTop = messages.scrollHeight;
 
-        $.ajax({
-            url: '/upload',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                openDashboardAlert('Profile Picture updated.');
-                previewImage.src = URL.createObjectURL(selectedFile);
-            },
-            error: function(error) {
-                openDashboardAlert(error.responseJSON.message);
-            }
-        });
-    } else {
-        // previewImage.src = "/storage/default-profile-pic.jpg";
+const createMessage = (name, msg) => {
+    const msgContent = `
+    <div class="row">
+        <span class="screenname">${name}:</span>
+        <span class="message">${msg}</span>
+    </div>
+    `;
+    messages.innerHTML += msgContent;
+};
+
+socketio.on("message", (data) => {
+    // console.log("A message has been transmitted");
+    if (data.type === "chat") {
+        createMessage(data.name, data.message);
+        messages.scrollTop = messages.scrollHeight;    
+    }
+    else { // "count" 
+        // viewerCount.innerHTML = data.message;
     }
 });
 
-document.getElementById('offline-banner-input-id').addEventListener('change', function(event) {
-    const previewImage = document.getElementById('preview-banner');
-    const selectedFile = event.target.files[0];
-    console.log("Banner was changed");
+const sendMessage = () => {
+    const userMessage = document.getElementById('db-chatTextBox');
+    if (userMessage.value == "") return;
+    socketio.emit("message", { data: userMessage.value });
+    userMessage.value = "";
+};
 
-    if (selectedFile) {
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('type', 'offline-banner')
-
-        $.ajax({
-            url: '/upload',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                openDashboardAlert('Offline banner updated.');
-                previewImage.src = URL.createObjectURL(selectedFile);
-            },
-            error: function(error) {
-                openDashboardAlert(error.responseJSON.message);
-            }
-        });
-    } else {
-        // previewImage.src = "/storage/default-offline-banner.jpg";
+const msgTextBox = document.getElementById('db-chatTextBox');
+msgTextBox.addEventListener("keydown", function (e) {
+    if (e.code == "Enter") {
+        sendMessage();
     }
 });
 
-document.getElementById('upload-area-profile-pic').addEventListener('click', function() {
-    document.getElementById('profile-picture-id').click();
-});
+function setCategoryValue(ctg) {
+    var selectElement = document.getElementById("category-menu");
+    selectElement.value = ctg;
+}
 
-document.getElementById('upload-area-banner').addEventListener('click', function() {
-    document.getElementById('offline-banner-input-id').click();
-});
+setCategoryValue(streamCategory);
 

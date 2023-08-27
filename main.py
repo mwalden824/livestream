@@ -27,6 +27,8 @@ STORAGE_PATH = "storage"
 STREAM_PATH = "stream/"
 THUMBNAIL_CREATION_PERIOD = 15 # seconds
 DEFAULT_DESCRIPTIOIN = "Streamer's description goes here."
+DEFAULT_STREAM_TITLE = "Stream Title Goes Here."
+DEFAULT_CATEGORY = "Chatting"
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "mysupersecretkeybitch"
@@ -53,6 +55,9 @@ class User(db.Model, UserMixin):
     discordUrl = db.Column(db.String(40), default="")
     tiktokUrl = db.Column(db.String(40), default="")
     description = db.Column(db.String(500), default=DEFAULT_DESCRIPTIOIN)
+    streamTitle = db.Column(db.String(40), default=DEFAULT_STREAM_TITLE)
+    category = db.Column(db.String(20), default=DEFAULT_CATEGORY)
+    streamTags = db.Column(db.String(40), default="")
 
     followers = db.relationship('User', secondary=followers, primaryjoin=(followers.c.follower_id == id), secondaryjoin=(followers.c.following_id == id), backref=db.backref('following', lazy='dynamic'), lazy='dynamic')
 
@@ -164,7 +169,7 @@ def home():
         if path.isdir(folder_path) and path.exists(tn_path):
             user = User.query.filter_by(streamKey=folder_name).first()
             username = user.username
-            online_streamers.append(username)
+            online_streamers.append((username, user.streamTitle))
 
     return render_template("home.html", streamers_online=online_streamers)
 
@@ -199,7 +204,10 @@ def streamname(streamer):
             smLinks=[user.youtubeUrl, user.twitterUrl, user.instagramUrl, user.discordUrl, user.tiktokUrl],
             followed=isFollowing,
             showFollowSubBtn=showFollowSub,
-            followerCount=str(num_followers))
+            followerCount=str(num_followers),
+            title_of_stream=user.streamTitle,
+            tags_of_stream=user.streamTags,
+            category_of_stream=user.category)
     else:
         return render_template("no-account.html", username=streamer)
 
@@ -313,8 +321,30 @@ def dashboard(streamer):
     user = User.query.filter_by(username=streamer).first()
     if user:
         if user.username == current_user.username:
+            session["room"] = str(streamer)
+            if str(streamer) not in rooms:
+                # session["room"] = str(streamer)
+                rooms[str(streamer)] = {"members": 0, "messages": []}
             return render_template(
-                "dashboard.html", 
+                "dashboard.html",
+                msgs=rooms[streamer]["messages"], 
+                stream_title=user.streamTitle,
+                stream_tags=user.streamTags,
+                stream_category=user.category,
+                username=user.username)
+        else:
+            return render_template("access-denied.html", attempted_username=user.username, actual_username=current_user.username)
+    else:
+        return render_template("no-account.html", username=streamer)
+
+@app.route("/<streamer>/settings")
+@login_required
+def settings(streamer):
+    user = User.query.filter_by(username=streamer).first()
+    if user:
+        if user.username == current_user.username:
+            return render_template(
+                "settings.html", 
                 username=streamer, 
                 ip_adress=STREAM_SERVER_URL, 
                 app_name=STREAM_APP_NAME, 
@@ -353,6 +383,22 @@ def save_settings():
 
     # Save description
     user.description = data["description"]
+
+    db.session.commit()
+
+    return jsonify({"message": "Settings saved"}), 200
+
+@app.route("/save_stream_settings", methods=['POST'])
+@login_required
+def save_stream_settings():
+    data = request.json
+    user = User.query.filter_by(username=current_user.username).first()
+
+    # print(data)
+
+    user.streamTitle = data["sTitle"]
+    user.streamTags = data["sTags"]
+    user.category = data["sCategory"]
 
     db.session.commit()
 
@@ -503,16 +549,17 @@ def search():
         results = db.session.query(User).filter(
             (
                 User.username.like(f"%{query}%") |
+                User.streamTitle.like(f"%{query}%") |
+                User.streamTags.like(f"%{query}%") |
+                User.category.like(f"%{query}%") |
                 User.description.like(f"%{query}%")
             )
         ).all()
-        # print(query)
-        # print(results)
 
         search_results = []
         for result in results:
             if result in liveStreamers:
-                search_results.append((result.username, True, "Stream Title Goes Here"))
+                search_results.append((result.username, True, result.streamTitle))
             else:
                 search_results.append((result.username, False, result.description))
 
@@ -520,6 +567,23 @@ def search():
 
     return "Error with Search", 400
 
+
+@app.route('/search/<tag>', methods=['GET'])
+def tag_search(tag):
+    results = db.session.query(User).filter(
+        (
+            User.streamTags.like(f"%{tag}%")
+        )
+    ).all()
+
+    search_results = []
+    for result in results:
+        if result in liveStreamers:
+            search_results.append((result.username, True, result.streamTitle))
+        else:
+            search_results.append((result.username, False, result.description))
+
+    return render_template("search.html", searchResult=search_results), 200
 
 @socketio.on("message")
 def message(data):

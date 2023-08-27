@@ -1,8 +1,7 @@
 {% extends "base.html" %}
-{% block title %}{{ username }}'s Dashboard{% endblock %}
+{% block title %}{{ current_user.username }}'s Dashboard{% endblock %}
 {% block content %}
-<!-- <div id="dashboard"> -->
-<main id="dashboard">
+<main class="dashboard-container" id="dashboard">
     <div id="dashboard-alert" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeDashboardAlert()">&times;</span>
@@ -19,136 +18,96 @@
             </div>
         </div>
     </div>
-    <div class="dashboard-title">
-        {{ username }}'s Dashboard
-    </div>
-    <div class="dashboard-elements">
-        <div class="dashboard-element" id="dashboard-profile-pic-banner">
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-profile-pic" id="upload-area-profile-pic">
-                    <div class="dashboard-element-row-profile-pic-avatar">
-                        <label for="profile-picture" id="profile-picture-label-id">
-                            <img id="preview-image" src="/storage/{{ username }}/profile-pic.jpg" alt="Profile Picture">
-                        </label>
-                        <input type="file" id="profile-picture-id" name="profile_picture">    
+    <div class="dashboard-columns">
+        <div class="dashboard-col-1">
+            <div id="content">
+                <div id="videoElement">
+                    <video id="videoPlayer" class="video-js vjs-default-skin" controls></video>
+                    <!-- <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i> -->
+                </div>
+                <div class="image-container">
+                    <!-- <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder"> -->
+                    <img src="/storage/{{ username }}/offline-banner.jpg" id="offline-image-placeholder">
+                    <!-- <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i> -->
+                </div>
+            </div>
+            <div class="stream-settings">
+                <div class="db-element-row">
+                    <div class="db-element-row-text">
+                        Stream Title:
                     </div>
-                    <div class="dashboard-element-row-profile-pic-avatar-text">
-                        Avatar
+                    <div class="db-element-row-input">
+                        <input type="text" class="db-textbox" id="stream-title" value="{{ stream_title }}">
                     </div>
                 </div>
-                <div class="dashboard-element-row-banner" id="upload-area-banner">
-                    <label for="offline-banner" id="offline-banner-label-id">
-                        <img id="preview-banner" src="/storage/{{ username }}/offline-banner.jpg" alt="Offline Banner">
-                    </label>
-                    <input type="file" id="offline-banner-input-id" name="offline_banner">
+                <div class="db-element-row">
+                    <div class="db-element-row-text">
+                        Stream Tags:
+                    </div>
+                    <div class="db-element-row-input">
+                        <input type="text" class="db-textbox" id="stream-tags" value="{{ stream_tags }}">
+                    </div>
+                </div>
+                <div class="db-element-row">
+                    <div class="db-element-row-text">
+                        Stream Category:
+                    </div>
+                    <div class="db-element-row-input">
+                        <select id="category-menu">
+                            <option value="Chatting">Chatting</option>
+                            <option value="Games">Games</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Cooking">Cooking</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="db-element-row-tags">
+                    <div class="db-element-row-tag" id="tags-of-stream">
+                        <div class="db-tag">IRL</div>
+                    </div>
+                </div>
+                <div class="db-element-row-save">
+                    <div class="db-element-row-save-div">
+                        <button class="btn btn-custom" id="dashboard-save-button">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="dashboard-element" id="dashboard-url-stream-key">
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    RTMP Server URL:
+        <div class="dashboard-col-2">
+            <div id="dashboard-chat">
+                <div class="db-chat-messages" id="db-chatMessages" onload="chatScrollDown()">
                 </div>
-                <div class="dashboard-element-row-value" id="rtmp-text">
-                    rtmp://{{ ip_adress }}/{{ app_name }}
+                <div class="db-chat-control">
+                    <input type="text" class="db-chat-textbox" id="db-chatTextBox">
+                    <button type="button" class="btn btn-custom" id="db-chat-send" onclick="sendMessage()">Send</button>
                 </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    Stream Key:
-                </div>
-                <div class="dashboard-element-row-value" id="rtmp-text">
-                    {{ key_for_stream }}
-                </div>
-            </div>
+            </div>                    
         </div>
-        <div class="dashboard-element" id="dashboard-password">
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    Old Password:
+        <div class="dashboard-col-3">
+            <div id="dashboard-chat-members">
+                <div class="chat-members" id="chatMembers">
                 </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="password" class="dashboard-textbox" id="old-password-textbox">
-                </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    New Password:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="password" class="dashboard-textbox" id="new-password-textbox">
-                </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    Re-try New Password:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="password" class="dashboard-textbox" id="new-password-retry-textbox">
-                </div>
-            </div>
-        </div>
-        <div class="dashboard-element" id="dashboard-social-media">
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    YouTube:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="text" class="dashboard-textbox" id="sm-youtube" value="{{ youtube }}">
-                </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    Twitter:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="text" class="dashboard-textbox" id="sm-twitter" value="{{ twitter }}">
-                </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    Instagram:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="text" class="dashboard-textbox" id="sm-instagram" value="{{ instagram }}">
-                </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    Discord:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="text" class="dashboard-textbox" id="sm-discord" value="{{ discord }}">
-                </div>
-            </div>
-            <div class="dashboard-element-row">
-                <div class="dashboard-element-row-title">
-                    TikTok:
-                </div>
-                <div class="dashboard-element-row-textbox">
-                    <input type="text" class="dashboard-textbox" id="sm-tiktok" value="{{ tiktok }}">
-                </div>
-            </div>
-        </div>
-        <div class="dashboard-element" id="dashboard-description-text">
-            <div>
-                Description                
-            </div>
-            <div>
-                <textarea type="text" class="dashboard-description-textbox" rows="5" id="dashboard-description-textbox-id">{{ userDescription }}</textarea>
-            </div>
+            </div>                                
         </div>
     </div>
-    <div class="dashboard-buttons">
-        <button class="buttons" id="dashboard-save-button">Save</button>
-    </div>
-<!-- </div> -->
 </main>
-<script type="script">
-    var account_name = {{ username }};
+<script type="text/javascript">
+    var streamPath = "{{ username }}";
+    var streamCategory = "{{ stream_category }}";
+    var streamTags = "{{ stream_tags }}";
 </script>
 <script src="../static/scripts/dashboard.js"></script>
+<script type="text/javascript">
+    displayTags(String(streamTags));
+</script>
 {% endblock %}
-
+{% block javascript %}
+    {% for msg in msgs %}
+    <script type="text/javascript">
+        createMessage("{{msg.name}}", "{{msg.message}}");
+        messages.scrollTop = messages.scrollHeight;
+    </script>
+    {% endfor %}
+{% endblock %}
 
 

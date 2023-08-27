@@ -34,6 +34,23 @@ videoPlayer.on('error', function (event) {
 videoPlayer.play();
 videoPlayer.muted(false);        
 
+function displayTags(inputString) {
+    var tags = inputString.split(" ");
+
+    var tagsHtml = document.getElementById('tags-for-stream');
+    tagsHtml.innerHTML = "";
+
+    if (inputString != "") {
+        for (var i = 0; i < tags.length; i++) {
+            tagsHtml.innerHTML += `
+            <a href='/search/` + String(tags[i]) + `'>
+                <div class='tag'>` + String(tags[i]) + `</div>
+            </a>
+            `;
+        }    
+    }
+}
+
 function showChat() {
     if (chatOpen == true) {
         chatOpen = false;

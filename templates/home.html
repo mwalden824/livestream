@@ -6,22 +6,22 @@
         <p>Browse Leech Streams</p>
     </div>
     <div class="online-streams">
-    {% for online_stream in streamers_online %}
-        <a href="/{{ online_stream }}">
+    {% for user, title in streamers_online %}
+        <a href="/{{ user }}">
             <div class="online-stream">
                 <div class="online-stream-thumbnail">
-                    <img src="/stream/{{ online_stream }}/thumbnail.jpg">
+                    <img src="/stream/{{ user }}/thumbnail.jpg">
                 </div>
                 <div class="online-stream-info">
                     <div class="online-stream-profile-pic">
-                        <img src="/storage/{{ online_stream }}/profile-pic.jpg">
+                        <img src="/storage/{{ user }}/profile-pic.jpg">
                     </div>
                     <div class="online-stream-info-text">
                         <div class="online-stream-info-text-streamer">
-                            {{ online_stream }}
+                            {{ user }}
                         </div>
                         <div class="online-stream-info-text-title">
-                            Title of Stream goes here
+                            {{ title }}
                         </div>
                     </div>
                 </div>
