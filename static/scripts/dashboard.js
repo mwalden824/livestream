@@ -16,7 +16,7 @@ function openDashboardAlert(alertMsg) {
 }
 
 videoPlayerElement.addEventListener("error", function() {
-    console.log("Video Error");
+    // console.log("Video Error");
     videoElement.style.display = 'none';
     imageFallback.style.display = 'block';
     isPlaying = false;
@@ -30,7 +30,7 @@ videoPlayer.src({
     type: 'application/x-mpegURL'
 });
 videoPlayer.on('error', function (event) {
-    console.log('Video Error');
+    // console.log('Video Error');
     videoElement.style.display = 'none';
     imageFallback.style.display = 'block';
     isPlaying = false;
@@ -83,6 +83,38 @@ $(document).ready(function() {
     });
 });
 
+var chatMembersDiv = document.getElementById('chatMembers');
+
+function chatAddMember(uname) {
+    const chatMember = `
+        <div class="chat-member-row">
+            <span class="screenname">${uname}</span>
+        </div>
+    `;
+
+    chatMembersDiv.innerHTML += chatMember;
+}
+
+function chatRemoveMember(uname) {
+    const children = chatMembersDiv.children;
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        for (let j = 0; j < child.children.length; j++) {
+            const innerChild = child.children[j];
+            // console.log(innerChild.innerHTML)
+            if (innerChild.innerHTML === uname) {
+                // Delete span and div parent objects
+                // console.log(child.parentElement);
+                chatMembersDiv.removeChild(innerChild.parentElement);
+                console.log("Parent and child removed!");
+                return;
+            }
+        }
+    }
+
+    console.log("No matching username");
+}
+
 var socketio = io();
 
 const messages = document.getElementById('db-chatMessages');
@@ -105,8 +137,14 @@ socketio.on("message", (data) => {
         createMessage(data.name, data.message);
         messages.scrollTop = messages.scrollHeight;    
     }
-    else { // "count" 
+    else if (data.type === "count") { 
         // viewerCount.innerHTML = data.message;
+        if (data.action === "add") {
+            chatAddMember(data.name);
+        }
+        else if (data.action === "remove") {
+            chatRemoveMember(data.name);
+        }
     }
 });
 

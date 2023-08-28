@@ -12,7 +12,7 @@ var isPlaying = true;
 
 openChatBtnOffline.style.display = 'none';
 videoPlayerElement.addEventListener("error", function() {
-    console.log("Video Error");
+    // console.log("Video Error");
     videoElement.style.display = 'none';
     imageFallback.style.display = 'block';
     isPlaying = false;
@@ -26,7 +26,7 @@ videoPlayer.src({
     type: 'application/x-mpegURL'
 });
 videoPlayer.on('error', function (event) {
-    console.log('Video Error');
+    // console.log('Video Error');
     videoElement.style.display = 'none';
     imageFallback.style.display = 'block';
     isPlaying = false;
@@ -96,7 +96,7 @@ socketio.on("message", (data) => {
         createMessage(data.name, data.message);
         messages.scrollTop = messages.scrollHeight;    
     }
-    else { // "count" 
+    else if (data.type === "count") {
         viewerCount.innerHTML = data.message;
     }
 });

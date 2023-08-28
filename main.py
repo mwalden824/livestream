@@ -194,11 +194,12 @@ def streamname(streamer):
         session["room"] = str(streamer)
         if str(streamer) not in rooms:
             # session["room"] = str(streamer)
-            rooms[str(streamer)] = {"members": 0, "messages": []}
+            rooms[str(streamer)] = {"members": 0, "messages": [], "users": []}
 
         return render_template(
             "streamer.html", 
             msgs=rooms[streamer]["messages"], 
+            viewers=str(rooms[streamer]["members"]),
             username=streamer, 
             userDescription=user.description,
             smLinks=[user.youtubeUrl, user.twitterUrl, user.instagramUrl, user.discordUrl, user.tiktokUrl],
@@ -324,10 +325,11 @@ def dashboard(streamer):
             session["room"] = str(streamer)
             if str(streamer) not in rooms:
                 # session["room"] = str(streamer)
-                rooms[str(streamer)] = {"members": 0, "messages": []}
+                rooms[str(streamer)] = {"members": 0, "messages": [], "users": []}
             return render_template(
                 "dashboard.html",
                 msgs=rooms[streamer]["messages"], 
+                users=rooms[streamer]["users"], 
                 stream_title=user.streamTitle,
                 stream_tags=user.streamTags,
                 stream_category=user.category,
@@ -479,7 +481,7 @@ def upload():
 @app.route("/logout")
 def logout():
     logout_user()
-    if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" and len(request.referrer) > 31:
+    if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" or request.referrer[-8:] == "settings" and len(request.referrer) > 31:
         return redirect("/")
     else:
         return redirect(request.referrer)
@@ -591,31 +593,44 @@ def message(data):
     content = {
         "type": "chat",
         "name": session.get("name"),
+        "action": "message",
         "message": data["data"]
     }
 
     send(content, to=room)
     rooms[room]["messages"].append(content)
-    # print(f"{session.get('name')} said: {data['data']}")
+    print(f"{session.get('name')} said: {data['data']}")
 
 @socketio.on("connect")
 def connect(auth):
     name = session.get("name")
     room = session.get("room")
-    if not name:
-        return
-    
+    join_room(room)
+
     if room not in rooms:
         return
 
-    join_room(room)
+    if not current_user.is_authenticated:
+        rooms[str(room)]["members"] += 1
+        # Update live viewer count
+        content = {
+            "type": "count",
+            "name": "anonymous",
+            "action": "add",
+            "message": rooms[str(room)]["members"]
+        }
+        send(content, to=room)
+        return
+    
     rooms[str(room)]["members"] += 1
+    rooms[str(room)]["users"].append(name)
     # print(f"{name} joined {room}'s room")
 
     # Update live viewer count
     content = {
         "type": "count",
-        "name": "",
+        "name": str(name),
+        "action": "add",
         "message": rooms[str(room)]["members"]
     }
     send(content, to=room)
@@ -630,13 +645,27 @@ def disconnect():
     if room not in rooms:
         return
 
+    if not current_user.is_authenticated:
+        rooms[str(room)]["members"] -= 1
+        # Update live viewer count
+        content = {
+            "type": "count",
+            "name": "anonymous",
+            "action": "remove",
+            "message": rooms[str(room)]["members"]
+        }
+        send(content, to=room)
+        return
+
     rooms[str(room)]["members"] -= 1
+    rooms[str(room)]["users"].remove(name)
     # print(f"{name} has left {room}'s room")
 
     # Update live viewer count
     content = {
         "type": "count",
-        "name": "",
+        "name": str(name),
+        "action": "remove",
         "message": rooms[str(room)]["members"]
     }
     send(content, to=room)

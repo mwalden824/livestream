@@ -75,6 +75,9 @@
         </div>
         <div class="dashboard-col-2">
             <div id="dashboard-chat">
+                <div class="db-title">
+                    STREAM CHAT
+                </div>
                 <div class="db-chat-messages" id="db-chatMessages" onload="chatScrollDown()">
                 </div>
                 <div class="db-chat-control">
@@ -85,6 +88,9 @@
         </div>
         <div class="dashboard-col-3">
             <div id="dashboard-chat-members">
+                <div class="db-title">
+                    STREAM MEMBERS
+                </div>
                 <div class="chat-members" id="chatMembers">
                 </div>
             </div>                                
@@ -106,6 +112,11 @@
     <script type="text/javascript">
         createMessage("{{msg.name}}", "{{msg.message}}");
         messages.scrollTop = messages.scrollHeight;
+    </script>
+    {% endfor %}
+    {% for usr in users %}
+    <script type="text/javascript">
+        chatAddMember(usr);
     </script>
     {% endfor %}
 {% endblock %}
