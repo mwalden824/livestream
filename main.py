@@ -481,6 +481,12 @@ def upload():
 @app.route("/logout")
 def logout():
     logout_user()
+    refUrl = request.referrer[7:]
+    refUrlSplit = refUrl.split("/")
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:")
+    print(refUrlSplit)
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:"+str(len(refUrlSplit)))
+
     if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" or request.referrer[-8:] == "settings" and len(request.referrer) > 31:
         return redirect("/")
     else:
