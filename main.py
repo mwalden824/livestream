@@ -487,10 +487,15 @@ def logout():
     print(refUrlSplit)
     print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX:"+str(len(refUrlSplit)))
 
-    if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" or request.referrer[-8:] == "settings" and len(request.referrer) > 31:
+    if (len(refUrlSplit) == 3) and ((refUrlSplit[2] == "dashboard") or (refUrlSplit[2] == "settings")):
         return redirect("/")
     else:
         return redirect(request.referrer)
+
+    # if request.referrer[0:22] == "http://" + HOST_NAME + ":" + str(APP_PORT) + "/" and request.referrer[-9:] == "dashboard" or request.referrer[-8:] == "settings" and len(request.referrer) > 31:
+    #     return redirect("/")
+    # else:
+    #     return redirect(request.referrer)
 
 @app.route('/stream/<streamer>/index.m3u8')
 def serve_playlist(streamer):
