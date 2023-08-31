@@ -177,11 +177,11 @@ def home():
 @app.route("/<streamer>", methods=["POST", "GET"])
 def streamname(streamer):
     user = User.query.filter_by(username=streamer).first()
-    followers = user.followers.all()
-    num_followers = len(followers)
-    showFollowSub = True
-    isFollowing = False
     if user:
+        followers = user.followers.all()
+        num_followers = len(followers)
+        showFollowSub = True
+        isFollowing = False
         if current_user.is_authenticated:
             if user in current_user.following.all():
                 isFollowing = True
