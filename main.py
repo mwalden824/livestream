@@ -18,7 +18,8 @@ import threading
 DB_NAME = "database.db"
 # STREAM_HOST_NAME = socket.gethostbyname(socket.gethostname())
 # STREAM_HOST_NAME = socket.gethostbyname(socket.getfqdn())
-HOST_NAME = "10.0.0.80"
+# HOST_NAME = "10.0.0.80"
+HOST_NAME = "veech.lol"
 STREAM_PORT = 1935
 STREAM_APP_NAME = "live"
 STREAM_SERVER_URL = HOST_NAME + ":" + str(STREAM_PORT)

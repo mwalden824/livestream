@@ -1308,3 +1308,12 @@ select {
     text-align: right;
     /* display: flex; */
 }
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
