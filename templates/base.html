@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Veech Streams{% endblock %}</title>
+    <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="../static/resources/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="/">
+                <div class="logo">
+                    <div class="logo-text">
+                        <!-- <img src="../static/resources/logo-text.png" alt="Logo"> -->
+                        <img src="../static/resources/NewLogo.png" alt="Logo">
+                    </div>
+                    <!-- <div class="logo-icon">
+                        <div id="logo-icon-image"></div>
+                    </div> -->
+                </div>    
+            </a>
+            <div class="search">
+                <form id="search-form" action="/search" method="post" class="search-form-class">
+                    <input type="text" name="query" placeholder="Search" id="search-textbox" class="search-element">
+                    <button type="submit" id="search-button" class="nav-button" type="submit" class="search-element">Search</button>
+                </form>
+            </div>
+            <div class="navbar-right">
+                {% if current_user.is_authenticated %}
+                    <div class="profile-picture-section">
+                        <div id="profile-menu-click-area">
+                            <div id="profile-menu" class="profile-menu">
+                                <ul>
+                                    <a href="/{{ current_user.username }}"><li>Channel</li></a>
+                                    <a href="/{{ current_user.username }}/dashboard"><li>Dashboard</li></a>
+                                    <a href="/{{ current_user.username }}/settings"><li>Settings</li></a>
+                                    <a href="/logout"><li>Logout</li></a>
+                                </ul>
+                            </div>
+                            <script>
+                                var menu = document.getElementById('profile-menu');
+                                function toggleProfileMenu() {
+                                    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+                                }
+
+                                // Close popup when clicking outside of it
+                                // document.addEventListener('click', function(event) {
+                                //     const isClickInsidePopup = menu.contains(event.target);
+
+                                //     if (!isClickInsidePopup) {
+                                //         menu.style.display = 'none';
+                                //     }
+                                // });
+                            </script>
+                            <img src="/storage/{{ current_user.username }}/profile-pic.jpg" alt="Profile Picture" id="profile-pic-placeholder" onclick="toggleProfileMenu()">
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="login">
+                        <button type="button" class="nav-button" id="login-button">Login</button>
+                    </div>
+                    <div class="signup">
+                        <button type="button" class="nav-button" id="signup-button">Signup</button>
+                    </div>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+    <div id="signupPopup" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSignupPopup()">&times;</span>
+            <div id="signup-login">
+                <h2>Signup</h2>
+            </div>
+            <div id="signup-error-alert" class="error-alert-class">
+                <div id="signup-error-alert-msg" class="error-alert-msg-class">
+                    Error alert message goes here
+                </div>
+            </div>
+            <div class="signup-input">
+                <form id="signup-form">
+                    <input type="text" class="signup-login-form" placeholder="Username" name="username-signup" id="username-signup-id" required>
+                    <input type="text" class="signup-login-form" placeholder="Email" name="email-signup" id="email-signup-id" required>
+                    <input type="password" class="signup-login-form" placeholder="Password" name="password-signup" id="password-signup-id" required>
+                    <input type="password" class="signup-login-form" placeholder="Re-try Password" name="password2-signup" id="password2-signup-id" required>
+                    <button type="button" class="signup-login-form-btn" id="submit-signup">Signup</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="loginPopup" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginPopup()">&times;</span>
+            <div id="signup-login">
+                <h2>Login</h2>
+            </div>
+            <div id="login-error-alert" class="error-alert-class">
+                <div id="login-error-alert-msg" class="error-alert-msg-class">
+                    Error alert message goes here
+                </div>
+            </div>
+            <div class="login-input">
+                <form id="login-form">
+                    <input type="text" class="signup-login-form" placeholder="Username" name="username-login" id="username-login-id" required>
+                    <input type="password" class="signup-login-form" placeholder="Password" name="password-login" id="password-login-id" required>
+                    <button type="button" class="signup-login-form-btn" id="submit-login">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="sidebar">
+            <!-- Sidebar content here -->
+            <div class="toggle-btn" onclick="show()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="sidebar-elements">
+                <div class="recommended-text">
+                    <!-- <img src="resources/logo-placerholder.png"> -->
+                    {% if current_user.is_authenticated %}
+                        <div class="recommended">FOLLOWED</div>
+                    {% else %}
+                        <div class="recommended">ONLINE</div>
+                    {% endif %}
+                </div>
+                <div class="streamers" id="streamers-id">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block content %}{% endblock %}
+    <script src="../static/scripts/script.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script> -->
+    {% block javascript %}{% endblock %}
+</body>
+</html>

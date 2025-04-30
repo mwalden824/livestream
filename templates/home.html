@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Veech{% endblock %}
+{% block content %}
+<main id="dashboard">
+    <div class="main-page-title">
+        <p>Browse Veech Streams</p>
+    </div>
+    <div class="online-streams">
+    {% for user, title in streamers_online %}
+        <a href="/{{ user }}">
+            <div class="online-stream">
+                <div class="online-stream-thumbnail">
+                    <img src="/stream/{{ user }}/thumbnail.jpg">
+                </div>
+                <div class="online-stream-info">
+                    <div class="online-stream-profile-pic">
+                        <img src="/storage/{{ user }}/profile-pic.jpg">
+                    </div>
+                    <div class="online-stream-info-text">
+                        <div class="online-stream-info-text-streamer">
+                            {{ user }}
+                        </div>
+                        <div class="online-stream-info-text-title">
+                            {{ title }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+    </div>
+</main>
+{% endblock %}
+{% block javascript %}
+{% endblock %}

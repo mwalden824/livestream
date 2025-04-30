@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<main id="dashboard">
+    <div id="dashboard-alert" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDashboardAlert()">&times;</span>
+            <div id="dashboard-alert-header">
+                <h2>Alert</h2>
+            </div>
+            <div class="dashboard-alert-message" id="dashboard-alert-msg">
+                <p>
+                    Your alert goes here.
+                </p>
+            </div>
+            <div class="ok-button">
+                <button class="signup-login-form-btn" onclick="closeDashboardAlert()">OK</button>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-title">
+        Settings
+    </div>
+    <div class="dashboard-elements">
+        <div class="dashboard-element" id="dashboard-profile-pic-banner">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-profile-pic" id="upload-area-profile-pic">
+                    <div class="dashboard-element-row-profile-pic-avatar">
+                        <label for="profile-picture" id="profile-picture-label-id">
+                            <img id="preview-image" src="/storage/{{ username }}/profile-pic.jpg" alt="Profile Picture">
+                        </label>
+                        <input type="file" id="profile-picture-id" name="profile_picture">    
+                    </div>
+                    <div class="dashboard-element-row-profile-pic-avatar-text">
+                        Avatar
+                    </div>
+                </div>
+                <div class="dashboard-element-row-banner" id="upload-area-banner">
+                    <label for="offline-banner" id="offline-banner-label-id">
+                        <img id="preview-banner" src="/storage/{{ username }}/offline-banner.jpg" alt="Offline Banner">
+                    </label>
+                    <input type="file" id="offline-banner-input-id" name="offline_banner">
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-url-stream-key">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    RTMP Server URL:
+                </div>
+                <div class="dashboard-element-row-value" id="rtmp-text">
+                    rtmp://{{ ip_adress }}/{{ app_name }}
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Stream Key:
+                </div>
+                <div class="dashboard-element-row-value" id="rtmp-text">
+                    {{ key_for_stream }}
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-password">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Old Password:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="password" class="dashboard-textbox" id="old-password-textbox">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    New Password:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="password" class="dashboard-textbox" id="new-password-textbox">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Re-try New Password:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="password" class="dashboard-textbox" id="new-password-retry-textbox">
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-social-media">
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    YouTube:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-youtube" value="{{ youtube }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Twitter:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-twitter" value="{{ twitter }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Instagram:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-instagram" value="{{ instagram }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    Discord:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-discord" value="{{ discord }}">
+                </div>
+            </div>
+            <div class="dashboard-element-row">
+                <div class="dashboard-element-row-title">
+                    TikTok:
+                </div>
+                <div class="dashboard-element-row-textbox">
+                    <input type="text" class="dashboard-textbox" id="sm-tiktok" value="{{ tiktok }}">
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-element" id="dashboard-description-text">
+            <div>
+                Description                
+            </div>
+            <div>
+                <textarea type="text" class="dashboard-description-textbox" rows="5" id="dashboard-description-textbox-id">{{ userDescription }}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-buttons">
+        <button class="buttons" id="dashboard-save-button">Save</button>
+    </div>
+</main>
+<script type="script">
+    var account_name = {{ username }};
+</script>
+<script src="../static/scripts/settings.js"></script>
+{% endblock %}
+
+
+

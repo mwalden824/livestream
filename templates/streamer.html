@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}{{ username }}'s Stream{% endblock %}
+{% block content %}
+<div class="left-container">
+    <div id="left-sidebar">
+        <div class="toggle-chat-btn" onclick="showChat()">
+            <i class="fas fa-comment-dots" style="font-size: 24px;color: white;"></i>
+        </div>
+        <div class="chat-messages" id="chatMessages" onload="chatScrollDown()">
+        </div>
+        <div class="chat-control">
+            {% if current_user.is_authenticated %}
+                <input type="text" class="chat-textbox" id="chatTextBox">
+                <button type="button" class="btn btn-custom" id="chat-send" onclick="sendMessage()">Send</button>
+            {% else %}
+                <input type="text" class="chat-textbox" id="chatTextBox" disabled>
+                <button type="button" class="btn btn-custom" id="chat-send" onclick="sendMessage()" disabled>Send</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<main id="main">
+     <!-- Main content goes here -->
+    <div id="content">
+        <div id="videoElement">
+            <video id="videoPlayer" class="video-js vjs-default-skin" controls></video>
+            <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i>
+        </div>
+        <div class="image-container">
+            <!-- <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder"> -->
+            <img src="/storage/{{ username }}/offline-banner.jpg" id="offline-image-placeholder">
+            <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i>
+        </div>
+    </div>
+    <div class="profile">
+        <div class="info-section">
+            <div class="profile-picture">
+                <img src="/storage/{{ username }}/profile-pic.jpg" id="profile-pic">
+            </div>
+            <div class="name-title-tags">
+                <div class="username">
+                    {{ username }}
+                </div>
+                <div class="stream-title">
+                    {{ title_of_stream }}
+                </div>
+                <div class="category-tags">
+                    <div class="category">
+                        {{ category_of_stream }}
+                    </div>
+                    <div id="tags-for-stream">
+                        <div class="tag">English</div>
+                    </div>
+                </div>
+            </div>
+            <div class="follow-sub-viewers">
+                <div class="follow-sub">
+                    {% if showFollowSubBtn and current_user.is_authenticated %}
+                        <div class="follow-sub-div">
+                            {% if followed %}
+                                <button class="follow-sub-btn" id="follow-button">Unfollow</button>
+                            {% else %}
+                                <button class="follow-sub-btn" id="follow-button">Follow</button>
+                            {% endif %}
+                        </div>
+                        <div class="follow-sub-div">
+                            <button class="follow-sub-btn">Subscribe</button>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="viewers">
+                    <div class="viewers-number" id="viewers-number-id">
+                        {{ viewers }}
+                    </div>
+                    <div class="viewers-icon">
+                        <img src="../static/resources/icons/viewers-icon.png" id="viewers-icon-img">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="about-section">
+            <div class="about-section-left">
+                <div class="about-username">
+                    About {{ username }}
+                </div>
+                <div class="followers">
+                    {{ followerCount }} Followers
+                </div>
+                <div class="description">
+                    {{ userDescription }}
+                </div>
+            </div>
+            <div class="about-section-right">
+                <div class="social-links">
+                    {% for link in smLinks %}
+                        {% if link != '' %}
+                            {% if loop.index == 1 %}
+                                <a href="{{ link }}" class="social-links"><div class="social-link"><img src="../static/resources/icons/youtube.png" class="social-icons">YouTube</div></a>
+                            {% endif %}
+                            {% if loop.index == 2 %}
+                                <a href="{{ link }}" class="social-links"><div class="social-link"><img src="../static/resources/icons/twitter.png" class="social-icons">Twitter</div></a>
+                            {% endif %}
+                            {% if loop.index == 3 %}
+                                <a href="{{ link }}" class="social-links"><div class="social-link"><img src="../static/resources/icons/instagram.png" class="social-icons">Instagram</div></a>
+                            {% endif %}
+                            {% if loop.index == 4 %}
+                                <a href="{{ link }}" class="social-links"><div class="social-link"><img src="../static/resources/icons/discord.png" class="social-icons">Discord</div></a>
+                            {% endif %}
+                            {% if loop.index == 5 %}
+                                <a href="{{ link }}" class="social-links"><div class="social-link"><img src="../static/resources/icons/tiktok.png" class="social-icons">TikTok</div></a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="profile-section">
+            <!-- Don't know what to add here yet. -->
+        </div>
+    </div>
+</main>
+<script type="text/javascript">
+    var streamPath = "{{ username }}";
+    var tagsForStream = "{{ tags_of_stream }}";
+</script>
+<script src="../static/scripts/streamer.js"></script>
+<script type="text/javascript">
+    displayTags(tagsForStream);
+</script>
+{% endblock %}
+{% block javascript %}
+    {% for msg in msgs %}
+    <script type="text/javascript">
+        createMessage("{{msg.name}}", "{{msg.message}}");
+        messages.scrollTop = messages.scrollHeight;
+    </script>
+    {% endfor %}
+{% endblock %}
+
+
+

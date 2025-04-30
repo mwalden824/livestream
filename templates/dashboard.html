@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}{{ current_user.username }}'s Dashboard{% endblock %}
+{% block content %}
+<main class="dashboard-container" id="dashboard">
+    <div id="dashboard-alert" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDashboardAlert()">&times;</span>
+            <div id="dashboard-alert-header">
+                <h2>Alert</h2>
+            </div>
+            <div class="dashboard-alert-message" id="dashboard-alert-msg">
+                <p>
+                    Your alert goes here.
+                </p>
+            </div>
+            <div class="ok-button">
+                <button class="signup-login-form-btn" onclick="closeDashboardAlert()">OK</button>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-columns">
+        <div class="dashboard-col-1">
+            <div id="content">
+                <div id="videoElement">
+                    <video id="videoPlayer" class="video-js vjs-default-skin" controls></video>
+                    <!-- <i class="fas fa-comment-dots chat-open-btn-overlay" id="open-chat-button" style="font-size: 24px;color: white;" onclick="showChat()"></i> -->
+                </div>
+                <div class="image-container">
+                    <!-- <img src="../static/resources/offline-image-placeholder.png" id="offline-image-placeholder"> -->
+                    <img src="/storage/{{ username }}/offline-banner.jpg" id="offline-image-placeholder">
+                    <!-- <i class="fas fa-comment-dots chat-open-btn-overlay-offline" id="open-chat-button-offline" style="font-size: 24px;color: white;" onclick="showChat()"></i> -->
+                </div>
+            </div>
+            <div class="stream-settings">
+                <div class="db-element-row">
+                    <div class="db-element-row-text">
+                        Stream Title:
+                    </div>
+                    <div class="db-element-row-input">
+                        <input type="text" class="db-textbox" id="stream-title" value="{{ stream_title }}">
+                    </div>
+                </div>
+                <div class="db-element-row">
+                    <div class="db-element-row-text">
+                        Stream Tags:
+                    </div>
+                    <div class="db-element-row-input">
+                        <input type="text" class="db-textbox" id="stream-tags" value="{{ stream_tags }}">
+                    </div>
+                </div>
+                <div class="db-element-row">
+                    <div class="db-element-row-text">
+                        Stream Category:
+                    </div>
+                    <div class="db-element-row-input">
+                        <select id="category-menu">
+                            <option value="Chatting">Chatting</option>
+                            <option value="Games">Games</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Cooking">Cooking</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="db-element-row-tags">
+                    <div class="db-element-row-tag" id="tags-of-stream">
+                        <div class="db-tag">IRL</div>
+                    </div>
+                </div>
+                <div class="db-element-row-save">
+                    <div class="db-element-row-save-div">
+                        <button class="btn btn-custom" id="dashboard-save-button">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-col-2">
+            <div id="dashboard-chat">
+                <div class="db-title">
+                    STREAM CHAT
+                </div>
+                <div class="db-chat-messages" id="db-chatMessages" onload="chatScrollDown()">
+                </div>
+                <div class="db-chat-control">
+                    <input type="text" class="db-chat-textbox" id="db-chatTextBox">
+                    <button type="button" class="btn btn-custom" id="db-chat-send" onclick="sendMessage()">Send</button>
+                </div>
+            </div>                    
+        </div>
+        <div class="dashboard-col-3">
+            <div id="dashboard-chat-members">
+                <div class="db-title">
+                    STREAM MEMBERS
+                </div>
+                <div class="chat-members" id="chatMembers">
+                </div>
+            </div>                                
+        </div>
+    </div>
+</main>
+<script type="text/javascript">
+    var streamPath = "{{ username }}";
+    var streamCategory = "{{ stream_category }}";
+    var streamTags = "{{ stream_tags }}";
+</script>
+<script src="../static/scripts/dashboard.js"></script>
+<script type="text/javascript">
+    displayTags(String(streamTags));
+</script>
+{% endblock %}
+{% block javascript %}
+    {% for msg in msgs %}
+    <script type="text/javascript">
+        createMessage("{{msg.name}}", "{{msg.message}}");
+        messages.scrollTop = messages.scrollHeight;
+    </script>
+    {% endfor %}
+    {% for usr in users %}
+    <script type="text/javascript">
+        chatAddMember(usr);
+    </script>
+    {% endfor %}
+{% endblock %}
+
+
